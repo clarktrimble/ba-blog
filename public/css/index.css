@@ -52,9 +52,23 @@ body {
 html {
 	overflow-y: scroll;
 }
-body {
-	max-width: 40em;
+body, img {
+	max-width: 50em;
+  /*
+	min-height: 100vh;
+	display: grid;
+	grid-template-rows: auto 1fr auto;
+  */
 }
+/* bumped from 40-50 for code blocks, pct */
+/* also hacking img to width here, pct */
+/* min-height and grid to push footer to bottom, pct */
+/* but mh/grid totally broke blog posts :/ */
+footer {
+	padding: 1rem;
+	text-align: center;
+}
+/* added footer style, pct */
 
 /* https://www.a11yproject.com/posts/how-to-hide-content/ */
 .visually-hidden {

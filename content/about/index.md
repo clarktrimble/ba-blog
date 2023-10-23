@@ -4,6 +4,6 @@ eleventyNavigation:
   key: About Me
   order: 3
 ---
-# About Me
+# {{ metadata.author.name }}
 
 I am a person that writes stuff.
