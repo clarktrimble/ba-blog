@@ -23,7 +23,7 @@ In the meantime, the blog is coming to life at `profound-gumdrop-ae4dd4.netlify.
 So, to tell Gandi to resolve the name to its address at Netlify:
 
 
-![Gandi DNS Records](../../../img/gandi-dnsrecords.png "Gandi DNS Records")
+{% image "./gandi-dnsrecords.png", "Gandi DNS Records" %}
 
 The lines of interest:
 
@@ -138,7 +138,7 @@ Back to our story: it make sense that Netlify's IP isn't just serving the lowly 
 How does it know?  Or not, in the case of trying to get there via browser.
 From the curl above, we see the host header is the magic.  Poking at the UI:
 
-![Netlify Domain](../../../img/netlify-domain.png "Netlify Domain")
+{% image "./netlify-domain.png", "Netlify Domain" %}
 
 we're able to tell Netlify about `clarktrimble.online` and voila, clarktrimble is online : )
 

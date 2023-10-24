@@ -1,12 +1,20 @@
+
+{#-
 ---
 layout: layouts/base.njk
 eleventyNavigation:
   key: RSS
   order: 4
 ---
+-}
 {%- css %}{% include "node_modules/prismjs/themes/prism-okaidia.css" %}{% endcss %}
 {%- css %}{% include "public/css/prism-diff.css" %}{%- endcss %}
 # RSS
+
+Hmm, _actually_ I don't seem to know what the "rel alt" links are about down there.
+Switching back to the hacked-in nav link and parking this here for the time being.
+
+
 
 I was fooling around with the blog, trying to put a link to the feed in the nav-bar by adding
 front matter to the `feed.njk` file.

@@ -11,6 +11,9 @@
 		<link rel="alternate" href="/feed/feed.xml" type="application/atom+xml" title="{{ metadata.title }}">
 		<link rel="alternate" href="/feed/feed.json" type="application/json" title="{{ metadata.title }}">
 
+		{#- IndieAuth #}
+    <link href="https://github.com/clarktrimble" rel="me">
+
 		{#- Uncomment this if you’d like folks to know that you used Eleventy to build your site!  #}
 		<meta name="generator" content="{{ eleventy.generator }}">
 
@@ -47,6 +50,7 @@
 				{%- for entry in collections.all | eleventyNavigation %}
 					<li class="nav-item"><a href="{{ entry.url }}"{% if entry.url == page.url %} aria-current="page"{% endif %}>{{ entry.title }}</a></li>
 				{%- endfor %}
+        <li class="nav-item"><a href="/feed/feed.xml">RSS</a></li>
 				</ul>
 			</nav>
 		</header>

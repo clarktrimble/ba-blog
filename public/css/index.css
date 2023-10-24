@@ -52,7 +52,8 @@ body {
 html {
 	overflow-y: scroll;
 }
-body, img {
+/* body, img { */
+body {
 	max-width: 50em;
   /*
 	min-height: 100vh;
@@ -69,6 +70,13 @@ footer {
 	text-align: center;
 }
 /* added footer style, pct */
+img {
+  max-width: 100%;
+}
+img[width][height] {
+  height: auto; /* Preserve aspect ratio */
+}
+/* added from https://www.zachleat.com/web/fluid-images/ , pct*/
 
 /* https://www.a11yproject.com/posts/how-to-hide-content/ */
 .visually-hidden {
