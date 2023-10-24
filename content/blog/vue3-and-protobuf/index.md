@@ -26,7 +26,7 @@ Vue and Envoy portions of that article are dated at this point.
 
 ## Overview
 
-![Overview](../../../img/vue3-grpc-overview.png "Overview")
+{% image "./overview.png", "Overview" %}
 
 Both the web application and Golang server are informed of the API specification by way of code generated from a Protobuf proto file.
 
