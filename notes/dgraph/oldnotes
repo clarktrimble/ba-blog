@@ -1,0 +1,54 @@
+
+
+From dgraph.com:
+
+    docker run --name <CONTAINER_NAME> -d -p "8080:8080" -p "9080:9080" -v <DGRAPH_DATA_PATH>:/dgraph dgraph/standalone:latest
+
+From minikube tutorial:
+
+    kubectl create deployment kubernetes-bootcamp --image=gcr.io/google-samples/kubernetes-bootcamp:v1
+
+Mashup!:
+
+    kubectl create deployment dgraph-testo --image=dgraph/standalone:v23.1.0
+
+    kubectl logs dgraph-testo-58d4b7b75d-fdr9x > dlogs.txt
+
+```
+$ grep 8080 dlogs.txt
+I0913 20:26:03.696718      36 run.go:566] Bringing up GraphQL HTTP API at 0.0.0.0:8080/graphql
+I0913 20:26:03.696769      36 run.go:567] Bringing up GraphQL HTTP admin API at 0.0.0.0:8080/admin
+I0913 20:26:03.697906      36 run.go:595] HTTP server started.  Listening on port 8080
+```
+
+```
+(in another terminal)
+trimble@debian:~/dgraph$ kubectl proxy
+Starting to serve on 127.0.0.1:8001
+```
+
+```
+trimble@debian:~$ kubectl get deployments
+NAME                           READY   UP-TO-DATE   AVAILABLE   AGE
+dgraph-testo                   1/1     1            1           62m
+prom-test-kube-state-metrics   1/1     1            1           3d4h
+prom-test-prometheus-server    1/1     1            1           3d4h
+
+trimble@debian:~$ kubectl expose deployment/dgraph-testo --type="NodePort" --port 8080
+service/dgraph-testo exposed
+
+trimble@debian:~$ kubectl get services
+NAME                                 TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+dgraph-testo                         NodePort    10.108.31.127    <none>        8080:31703/TCP   20s
+kubernetes                           ClusterIP   10.96.0.1        <none>        443/TCP          106d
+prom-test-kube-state-metrics         ClusterIP   10.101.225.238   <none>        8080/TCP         3d4h
+prom-test-prometheus-node-exporter   ClusterIP   10.106.183.133   <none>        9100/TCP         3d4h
+prom-test-prometheus-server          ClusterIP   10.98.5.163      <none>        80/TCP           3d4h
+
+### run in background / another terminal !!
+trimble@debian:~$ minikube ip
+192.168.49.2
+
+trimble@debian:~$ curl 192.168.49.2:31703/admin
+{"errors":[{"message":"no query string supplied in request"}],"extensions":{"tracing":{"version":1,"startTime":"2023-09-13T21:31:17.186391025Z","endTime":"2023-09-13T21:31:17.186542989Z","duration":151963}}}
+```
