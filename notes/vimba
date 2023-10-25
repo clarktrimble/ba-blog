@@ -1,0 +1,5 @@
+
+
+open stuff in vim from ag:
+
+$ vim `ag -l xform`

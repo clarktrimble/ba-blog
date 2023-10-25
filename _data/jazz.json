@@ -1,0 +1,11 @@
+{
+  "albums": [
+    {
+      "artist": "Gene Ammons",
+      "title": "Blue Gene",
+      "youtube": "https://www.youtube.com/watch?v=YF_OG0O8QsU",
+      "media_type": "longPlay",
+      "image": "https://i.scdn.co/image/ab67616d0000b273bdd3efb97eae51db5b7d442b"
+    }
+  ]
+}
