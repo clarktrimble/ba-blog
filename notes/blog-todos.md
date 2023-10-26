@@ -9,3 +9,4 @@
 - On This Page toc's for posts
 - Jazz page (first "living doc" page) maybe data-driven?
 - fix tab/space madness
+- shrink body width back down to 40em and make the code blocks wider

@@ -6,6 +6,20 @@
       "youtube": "https://www.youtube.com/watch?v=YF_OG0O8QsU",
       "media_type": "longPlay",
       "image": "https://i.scdn.co/image/ab67616d0000b273bdd3efb97eae51db5b7d442b"
+    },
+    {
+      "artist": "Cannonball Adderley",
+      "title": "The Cannonball Adderley Quintet In San Francisco",
+      "youtube": "https://www.youtube.com/watch?v=ymnXaR6h9p0",
+      "media_type": "longPlay",
+      "image": "https://i.scdn.co/image/ab67616d0000b273af06a4e9504805e9f8fdb36b"
+    },
+    {
+      "artist": "Sonny Criss",
+      "title": "This Is Criss",
+      "youtube": "https://www.youtube.com/watch?v=6blmKImWWsQ",
+      "media_type": "longPlay",
+      "image": "https://i.scdn.co/image/ab67616d0000b273648179453cf014d478b324af"
     }
   ]
 }
