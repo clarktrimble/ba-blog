@@ -1,0 +1,98 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[english]{babel}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{noto}
+
+\geometry{
+ a4paper,
+ total={170mm,267mm},
+ left=20mm,
+ top=15mm,
+ }
+
+\setlength{\parindent}{0pt}
+\renewcommand{\familydefault}{\sfdefault}
+\pagestyle{empty}
+\setlength\tabcolsep{0pt}
+
+
+\begin{document}
+\raggedright
+
+\hfill \textbf{\huge Patrick Clark Trimble}
+
+\hfill https://github.com/clarktrimble
+
+\hfill pctrimble@gmail.com
+
+\hfill 408 472-2204
+\vfill
+
+Experienced systems \textbf{designer}, \textbf{developer}, and \textbf{operator}, enthusiastic aggregator, advocate, and communicator of good ideas, seeking a position with responsibility for problem solving.
+\vfill
+
+I thoroughly enjoy the process of balancing practical constraints against the ideals of beautiful code in languages such as Go, Python, Ruby, and JavaScript.
+\vfill
+
+\textcolor[gray]{0.4}{F5 Inc \hfill Dec 2014 - May 2023}
+
+\textbf{Principal Architect}
+\vspace{7pt}
+
+Designer responsible for the conceptualization, promotion, and development of orchestration and automation systems to maintain fidelity between intended and actual configuration of infrastructure across globally distributed data centers.
+\vspace{11pt}
+
+\textbf{DevOps Engineer}
+\vspace{5pt}
+
+Engineer participating in the rapid scale-up of a recently acquired startup.  Of the many challenges involved, standing up scaled logging and stats collection and the development of distributed services as needed, are among the most interesting.
+\vfill
+
+\textcolor[gray]{0.4}{The University of Tulsa \hfill Mar 1999 - Sep 2014}
+
+\textbf{IT Architect}
+\vspace{7pt}
+
+Designer responsible for completely overhauling the university's identity-management system, including federated single-sign-on, multi-factor authentication and the provisioning of resources on and off campus.
+\vspace{11pt}
+
+\textbf{DevOps Engineer}
+\vspace{5pt}
+
+Engineer supporting the university web-services group, with activities including virtualisation of infrastructure, implementation of version control, creation and deployment of applications, and the development of supporting libraries.
+\vspace{11pt}
+
+\textbf{System Administrator}
+\vspace{5pt}
+
+Administrator deploying, maintaining and migrating campus-wide infrastructure including: email, web services, file services, storage area network, authentication services, service monitoring and backup in an environment supporting around 12000 active user accounts
+\vfill
+
+\textcolor[gray]{0.4}{Flight Safety International \hfill Jul 1998 - Feb 1999}
+
+\textbf{Software Engineer}
+\vspace{7pt}
+
+Developer creating features for and resolving issues with Instructor Station of full-motion FAA-certified flight simulators.
+\vfill
+
+\textcolor[gray]{0.4}{Schlumberger \hfill Jul 1995 - Feb 1998}
+
+\textbf{Baseline Manager}
+\vspace{7pt}
+
+Engineer compiling daily builds of oilfield services applications along with substantial improvements to the development process such as version control and issue tracking.
+\vfill
+
+M.S., \textbf{Applied Mathematics} (4.0) \hfill The University of Tulsa
+\vspace{3pt}
+
+B.S., \textbf{Mechanical Engineering} (3.7) \hfill The University of Texas at Austin
+\vspace{3pt}
+
+\textbf{National Merit Scholar} \hfill Go Trojans!
+\vfill
+
+\end{document}
