@@ -9,6 +9,29 @@ layout: layouts/post.njk
 
 In this post we'll take a look at passing configuration via environmental variables and an approach to encapsulating configuration in Golang.
 
+```
+
+    ┌─────────────────┐                     ┌────────────────────────────────┐
+    │ package one     │                     │ package main                   │
+    │                 │                     │                                │
+    │ Config{         ├────────────────────►│ Config{                        │
+    │  Port: int      │                     │  One: *one.Config              │
+    │ }               │     ┌──────────────►│  Two: *two.Config              │
+    │                 │     │               │  DryRun: bool                  │
+    └─────────────────┘     │               │ }                              │
+                            │               │                                │
+                            │               │ envconfig.Process("pfx", &cfg) │
+    ┌─────────────────┐     │               └────────────────────────────────┘
+    │ package two     │     │
+    │                 │     │
+    │ Config{         ├─────┘                Usage:
+    │  User: string   │                      KEY                TYPE
+    │ }               │                      PFX_DRYRUN         Bool
+    │                 │                      PFX_ONE_PORT       Integer
+    └─────────────────┘                      PFX_TWO_USER       String
+
+```
+
 ## Configuration via Environment
 
 The idea here is to pass config to an application by way of envars rather than command line options or file.
@@ -17,7 +40,7 @@ Command line options get out of hand along with the number of configurables.
 As a project scales up, the cost of also managing config files scales as well.
 Envars are simple key-value pairs just there in, ah, the environment.
 
-Scaled infrastructures built on containerization have good support for envvar config, perhaps even favoring the approach.
+Scaled infrastructures built on containerization have good support for environmental config, perhaps even favoring the approach.
 The generally sane Twelve-Factor App site has a good [take](https://12factor.net/).
 In particular, I'll draw attention to:
 
@@ -49,10 +72,11 @@ Enter the excellent `envconfig` module!
 
 ### envconfig
 
-The [envconfig](https://github.com/kelseyhightower/envconfig) module "decodes" envvars sharing a prefix into a struct provided by the app.
+The [envconfig](https://github.com/kelseyhightower/envconfig) module "decodes" environment variables sharing a prefix into a struct provided by the app.
 This is similar to the familiar parsing of json into a struct with `Unmarshal`.
 
 I like the single-responsibility feel of `envconfig` and have had good results with it.
+
 And check out the `go.mod` (no dependencies!):
 
 ```go
@@ -111,7 +135,7 @@ PFX_DBUSERNAME    String                      true        db service acct name
 PFX_DRYRUN        True or False                           dig up metadata, but don't post
 ```
 
-I often find myself invoking `Usage` to refresh my memory for a particular app and quite frequently copying and pasting from there for a quick list of the envvar names.
+I often find myself invoking `Usage` to refresh my memory for a particular app and quite frequently copying and pasting from there for a quick list of the variable names.
 
 ### Aside on Command Line
 
@@ -240,7 +264,7 @@ There you'll see `envconfig` lightly wrapped by the [launch](https://github.com/
 
 ## Conclusion
 
- - envvars are a workable approach to config, perhaps even preferred at scale
+ - environment variables are a workable approach to config, perhaps even preferred at scale
  - `envconfig` is a tidy module, capable of carrying the water for Golang
  - mapping config into a top-level struct allows for encapsulation and simple reporting
 

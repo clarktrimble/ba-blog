@@ -26,6 +26,7 @@ Honestly, I don't know of a better option.
 Pardon my french, but "word processors" aren't really up to it (or _we_ aren't at least) and the tidal-waves of templates out there are a shit-show.
 
 With LaTex you can expect something that looks crisp and unique.
+
 Have a look at some of the markup:
 
 ```latex
@@ -75,7 +76,7 @@ I definitely tried it at some point .. lol.
 
 [Texmaker](https://www.xm1math.net/texmaker/) is the one I used last time.
 
-It did a good job and I especially appreciated the solid built-in package management.
+It did a good job and I especially appreciated the solid, built-in package management.
 
 ### TeX Live
 
@@ -99,7 +100,7 @@ Wvrmmmm .!!... cloink, frmppp; `pdflatex` failed with `cannot find noto.sty`.
 ### How hard can it be to add one font?
 
 `apt-file search noto.sty` says `texlive-fonts-extra` but Debian wants to install a couple of gig's of stuff along the way.
-I'm feeling upbeat, "I'll just pop that in my own-self and show them!
+I'm feeling upbeat, "I'll just pop that in my own-self and show them!"
 CTAN (should have been my first clue?) has as nice [package](https://ctan.org/pkg/noto?lang=en) and the [instructions](https://www.tug.org/fonts/fontinstall.html) are only a little daunting ...
 
 Kinda looked like something good was happening, but `pdflatex` never found the `noto.sty`.
