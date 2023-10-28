@@ -34,11 +34,11 @@ In this post we'll take a look at passing configuration via environmental variab
 
 ## Configuration via Environment
 
-The idea here is to pass config to an application by way of envars rather than command line options or file.
+The idea is to pass config to an application by way of environment variables rather than command line options or file.
 
 Command line options get out of hand along with the number of configurables.
 As a project scales up, the cost of also managing config files scales as well.
-Envars are simple key-value pairs just there in, ah, the environment.
+Environment variables are simple key-value pairs just there in, ah, the environment.
 
 Scaled infrastructures built on containerization have good support for environmental config, perhaps even favoring the approach.
 The generally sane Twelve-Factor App site has a good [take](https://12factor.net/).
