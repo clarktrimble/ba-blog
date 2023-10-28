@@ -147,7 +147,7 @@ code {
 }
 pre:not([class*="language-"]) {
 	margin: .5em 0;
-	line-height: 1.375; /* 22px /16 */
+	line-height: 1.125;
 	-moz-tab-size: var(--syntax-tab-size);
 	-o-tab-size: var(--syntax-tab-size);
 	tab-size: var(--syntax-tab-size);
@@ -163,6 +163,8 @@ pre:not([class*="language-"]) {
 code {
 	word-break: break-all;
 }
+/* line-height: 1.375; /* 22px /16 */
+/* reduced lh for acsiiflow verticals (179), pct */
 
 /* Header */
 header {
