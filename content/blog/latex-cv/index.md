@@ -9,6 +9,8 @@ layout: layouts/post.njk
 
 Just a quick post so I'll never forget, or at least not lose the source, again :/
 
+{% image "./gutenberg.png", "LaTex sample output" %}
+
 ## TL;DR
 
 [Source](/pdf/clark-trimble-cv.tex.txt) and the corresponding [output](/pdf/clark-trimble-cv.pdf).
