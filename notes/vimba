@@ -3,3 +3,8 @@
 open stuff in vim from ag:
 
 $ vim `ag -l xform`
+
+:set listchars=eol:¬,tab:>·,trail:~,extends:>,precedes:<,space:␣
+:set list
+
+jq
