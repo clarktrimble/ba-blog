@@ -18,48 +18,44 @@ ClickHouse is billed as a scalable backend for large amounts of data coming at y
 Like maybe trillions of records arriving in the 100's of millions per second!
 
 Quantities of this sort strongly imply logs and stats, although the rather interesting sample datasets in their docs go well beyond.
-I'm wondering if ClickHouse could be an alternative to Elasticsearch for logs and and Prometheus for stats.
+I'm wondering if ClickHouse could be an alternative to Elasticsearch for logs and Prometheus for stats.
 
 ### Kool-Aid
 Kool-Aid down the hatch?
-Almost certainly; look for the ClickHouse "warts" post some months from now :)
+Almost certainly -- look for the ClickHouse "warts" post some months from now : )
 
-For the moment, ClickHouse "feels" good:
+For the time being, ClickHouse "feels" good:
 
  - plenty of GitHub stars
  - interesting, informative documentation
  - obsession/passion with performance
  - practical and technology driven culture
- - easy to get a dev instance running
 
 A quote from their "Why so fast?" page:
 
 > Last but not least, the ClickHouse team always monitors the Internet on people claiming that they came up with the best implementation, algorithm, or data structure to do something and tries it out. Those claims mostly appear to be false, but from time to time you’ll indeed find a gem.
-
-Like many, they're monetezing and the website is littered with prompts to try the Service.
-Hopefully, this will work out.
 
 ### Column Oriented
 
 Many aspects contributing to the performance claimed by ClickHouse are beyond the scope of this post, but my guess is that "column-oriented" is the killer feature.
 Columns of table are stored apart from each other, which allows for better compression and so forth.
 
-Where column-oreiented started to click for me was in a gem of an article in the docs about [sparse primary indexes](https://clickhouse.com/docs/en/optimize/sparse-primary-indexes).
-In describing how the primary and secondary indexes work in ClickHouse, one is necessarily exposed to the granular, or blocky, nature of data is written and read.
-Individual rows are not directly accessable.
+Where column-oriented started to click for me was in a gem of an article in the docs about [sparse primary indexes](https://clickhouse.com/docs/en/optimize/sparse-primary-indexes).
+In describing how the primary and secondary indexes work in ClickHouse, one is necessarily exposed to the granular, or blocky, nature of how data is written and read.
+Individual rows are not directly accessible.
 The closest you can get is the block in which a row is to be found.
 Of course, you can write a query that returns a row, but ClickHouse will grab at least one block, or quite possibly all of them, and discard the rest.
-However, when you want data in lbulk, a system built around getting and putting blocks of it can out-perform one that is not.
+However, when you want data in bulk, a system built around getting and putting blocks of it can out-perform one that is not.
 
 Ok, column-oriented bulk, this is good for ?.., well, analysis.
 Say you've got weblogs of the form: timestamp, domain, path, response code, and elapsed time.
 An aggregation can be used to transform the logged data into stats like requests per unit time, or paths taking longer than they did yesterday to respond.
 And those or other stats can be rolled up for less detailed views.
-Weblogs are the prototypical data firehose, so handling them with efficiency and perfomance in mind will help.
-
-Todo: belabor curiosity!!
+Weblogs are the prototypical data firehose, so handling them with efficiency and performance in mind will be advantageous.
 
 ## Golang Client
+
+When trying to get familiar with a new back-end, there's nothing like starting an instance and programmatically writing and reading a little data.
 
 Turning to the Golang hammer, we have a choice of client libraries!:
 
@@ -121,7 +117,7 @@ Query id: ad629ba8-7ad2-4595-b357-62f263021d99
 
 Yes!
 
-#### Step Two: get stuff out (programatticaly)
+#### Step Two: get stuff out (programmatically)
 
 Um, surprisingly, I'm not finding an example for this.
 
@@ -132,7 +128,7 @@ I'm up for a challenge :)
 
 The code in the insert example cited above can be fairly described as in need of a little factoring.
 The gods know, I love a good factoring and after getting something working on the read side, I began to factor.
-What started with reusing the same Columns for both `input` and `results` wound up with a complete seperation of any details for a particular struct/table from a reusable corpus of `funhouse` code including reflection over "col" tags.
+What started with reusing the same Columns for both `input` and `results` wound up with a complete separation of any details for a particular struct/table from a reusable corpus of `funhouse` code including reflection over "col" tags.
 
 I had fun.
 I stretched; creating a "col" tag with reflection was interesting and informative.
@@ -141,7 +137,7 @@ Maybe it's even a good start on something worthy?
 
 In the end though, I'm an engineer at heart.
 When it comes to code, this means simpler is my preference.
-So I've parked the well-seperated approach and we'll look at something a bit clunkier and considerbly more accessable for the remainder of the post.
+So I've parked the well-separated approach and we'll look at something a bit clunkier and considerably more accessible for the remainder of the post.
 
 Examples:
  - [reflecting/main.go](https://github.com/clarktrimble/funhouse/blob/main/examples/reflecting/main.go)
@@ -154,6 +150,7 @@ Let's take a look at a row vs column oriented struct representing a message.
 Here's a row-oriented msg struct:
 
 ```go
+// entity/msg.go
 type Severity struct {
         Txt string
         Num uint8
@@ -167,9 +164,10 @@ type Msg struct {
 }
 ```
 
-And the equivelant column-oreiented one:
+And the equivalent column-oriented one:
 
 ```go
+// entity/msg.go
 type MsgCols struct {
         Length       int
         Timestamps   []time.Time `col:"ts"`
@@ -182,20 +180,21 @@ type MsgCols struct {
 ```
 
 Nothing mind-blowing; the slices surely are column-oriented.
-Depending on our use case, we can eaisly transform between the two.
+Depending on our use case, we can easily transform between the two.
 
 
 #### TL;DR
 
 As we'll see below, the column-oriented struct comes in handy with `ch-go`.
 
-This is a good summary of "column-oreiented" writ small in Golang.
+This is a good summary of "column-oriented" writ small in Golang.
 
 ### Insert / Put
 
 Diving deeper into the Golang, `PutColumns` inserts messages into the table a chunk at a time:
 
 ```go
+// examples/generable/msg/msg.go
 func PutColumns(ctx context.Context, client *ch.Client, chunkSize int, mcs *entity.MsgCols) (err error) {
   err = mcs.CheckLen()
   if err != nil {
@@ -235,6 +234,7 @@ From the above, it's not obvious that `input` and `dataCols` share the same unde
 A look at the `Input` method should throw some light on the matter:
 
 ```go
+// funlite/funlite.go
 func Input(names []string, byName map[string]proto.Column) (input proto.Input) {
   input = proto.Input{}
   for _, name := range names {
@@ -252,6 +252,7 @@ func Input(names []string, byName map[string]proto.Column) (input proto.Input) {
 `GetColumns` reads messages from the table a block at a time:
 
 ```go
+// examples/generable/msg/msg.go
 func GetColumns(ctx context.Context, client *ch.Client, qSpec string) (mcs *entity.MsgCols, err error) {
   mcs = &entity.MsgCols{}
   results := fl.Results(colNames, dataCols)
@@ -280,17 +281,14 @@ func GetColumns(ctx context.Context, client *ch.Client, qSpec string) (mcs *enti
 }
 ```
 
-Salient points:
+The tricky part for me was to (mostly) ignore `block` in the handler and read from the enclosed `results`.
+Again, the data is handled block-wise enabling column-oriented efficiency.
 
- - block at a time
- - results are constructed similarly to input above
- - block is not much used in the callback, results are in the enclosed results!
- - more copied from readme please
-
-A closer look at one of the helpers:
+Per-column appends use type-specific helpers.
+Let's have closer look at one of them:
 
 ```go
-// Todo: add comments showing file path for this code
+// funlite/funlite.go
 func Dt64Values(cr proto.ColResult) (vals []time.Time) {
   ca, ok := cr.(*proto.ColDateTime64)
   if !ok {
@@ -304,6 +302,8 @@ func Dt64Values(cr proto.ColResult) (vals []time.Time) {
   return
 }
 ```
+
+One of these will be needed for each type of `proto.Column` used in the table.
 
 ## The End
 
@@ -334,6 +334,6 @@ Especially pushing things to the point where additional tables are needed.
 
 ### Thanks
 
-Hey you made it to the end!
+Hey, you made it to the end!
 Thank you for reading : )
 
