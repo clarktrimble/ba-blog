@@ -4,7 +4,13 @@ open stuff in vim from ag:
 
 $ vim `ag -l xform`
 
+ funhouse
+
+:set listchars=eol:¬,tab:>·,trail:~,extends:>,precedes:<,space:␣
+:set list
+
 :set listchars=eol:¬,tab:>·,trail:~,extends:>,precedes:<,space:␣
 :set list
 
 jq
+ main
