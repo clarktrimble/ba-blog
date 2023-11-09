@@ -17,12 +17,13 @@ In this post we'll take a look at ClickHouse and explore it's columnar nature vi
 ClickHouse is billed as a scalable backend for large amounts of data coming at you fast.
 Like maybe trillions of records arriving in the 100's of millions per second!
 
-Quantities of this sort strongly imply logs and stats, although the rather interesting sample datasets in their docs go well beyond.
-I'm wondering if ClickHouse could be an alternative to Elasticsearch for logs and Prometheus for stats.
+Quantities of this sort strongly imply logs and stats, although the sample datasets in the docs go well beyond.
+I'm thinking of where ClickHouse would be an attractive alternative to more established technologies such as Elasticsearch for logs and Prometheus for stats.
 
 ### Kool-Aid
+
 Kool-Aid down the hatch?
-Almost certainly -- look for the ClickHouse "warts" post some months from now : )
+Almost certainly -- look for the "warts" post some months from now : )
 
 For the time being, ClickHouse "feels" good:
 
@@ -37,25 +38,29 @@ A quote from their "Why so fast?" page:
 
 ### Column Oriented
 
-Many aspects contributing to the performance claimed by ClickHouse are beyond the scope of this post, but my guess is that "column-oriented" is the killer feature.
+Many aspects contributing to the performance talked up by ClickHouse are beyond the scope of this post, and "column-oriented" is in the tag-line and therefore likely to be a heavy hitter.
 Columns of table are stored apart from each other, which allows for better compression and so forth.
 
-Where column-oriented started to click for me was in a gem of an article in the docs about [sparse primary indexes](https://clickhouse.com/docs/en/optimize/sparse-primary-indexes).
-In describing how the primary and secondary indexes work in ClickHouse, one is necessarily exposed to the granular, or blocky, nature of how data is written and read.
+Where column-oriented started to click for me was in a gem of an article about [sparse primary indexes](https://clickhouse.com/docs/en/optimize/sparse-primary-indexes).
+In describing how the primary and secondary indexes behave, one is necessarily exposed to the granular, or blocky, nature of how data is written and read.
 Individual rows are not directly accessible.
-The closest you can get is the block in which a row is to be found.
-Of course, you can write a query that returns a row, but ClickHouse will grab at least one block, or quite possibly all of them, and discard the rest.
+The closest you can get is to process the block in which a row is to be found.
+Typically these blocks, or granules, are as large as 8192 records, almost 3 orders of magnitude.
+
+Of course, you can write a query that returns a single row, but ClickHouse will grab at least one block, or quite possibly all of them if your indexing doesn't support it, and discard the rest of the data.
 However, when you want data in bulk, a system built around getting and putting blocks of it can out-perform one that is not.
 
-Ok, column-oriented bulk, this is good for ?.., well, analysis.
+Ok, column-oriented bulk, this is good for ?.., well -- analysis.
 Say you've got weblogs of the form: timestamp, domain, path, response code, and elapsed time.
 An aggregation can be used to transform the logged data into stats like requests per unit time, or paths taking longer than they did yesterday to respond.
-And those or other stats can be rolled up for less detailed views.
-Weblogs are the prototypical data firehose, so handling them with efficiency and performance in mind will be advantageous.
+And those or other stats can be rolled up for higher-level views.
+Weblogs are the proverbial data firehose, so handling them with efficiency and performance in mind will be advantageous.
+
+So, yeah, starting to get a feel for column-oriented, but let's dig a little more.
 
 ## Golang Client
 
-When trying to get familiar with a new back-end, there's nothing like starting an instance and programmatically writing and reading a little data.
+When trying to get to know a new back-end, there's nothing like starting an instance and programmatically writing and reading a little data.
 
 Turning to the Golang hammer, we have a choice of client libraries!:
 
@@ -73,7 +78,7 @@ Looks like a good choice for exploring and learning .. coin flip .. ch-go it is!
 
 ## FunHouse
 
-I cleverly name my exploring project FunHouse and it can be found on [GitHub](https://github.com/clarktrimble/funhouse/tree/main) for reference.
+I cleverly name my exploratory project FunHouse which can be found on [GitHub](https://github.com/clarktrimble/funhouse/tree/main) for reference.
 
 ### First Steps
 
@@ -88,15 +93,15 @@ docker run -d \
   clickhouse/clickhouse-server
 ```
 
-No sweat!
-I really appreciate being able to get a standalone dev server running without a lot of fuss.
-Thanks ClickHouse :)
+I appreciate being able to get a standalone dev server running without a lot of fuss.
+
+Thanks ClickHouse!
 
 #### Step One: put some stuff in
 
 Cut and paste from the [insert example](https://github.com/ClickHouse/ch-go/blob/main/examples/insert/main.go) in the ch-go repo and .. it works!
 
-I think.  Let's take a peek with the CLI client:
+I think.  Let's take a peek with the CLI client to be sure:
 
 ```bash
 $ docker exec -it ch-dev clickhouse-client
@@ -121,33 +126,29 @@ Yes!
 
 Um, surprisingly, I'm not finding an example for this.
 
-Not to worry!
-I'm up for a challenge :)
+Not to worry.
+I'm up for a challenge!
 
 ### Wrong Turn
 
-The code in the insert example cited above can be fairly described as in need of a little factoring.
-The gods know, I love a good factoring and after getting something working on the read side, I began to factor.
-What started with reusing the same Columns for both `input` and `results` wound up with a complete separation of any details for a particular struct/table from a reusable corpus of `funhouse` code including reflection over "col" tags.
+The ch-go example code cited above can be fairly described as in need of a little factoring.
+Gods know, I love a good factoring.
+So after getting something working on the read side, I began to factor.
+What started with reusing the same `proto.Column`'s for both `input` and `results` became a complete separation of any details for a particular struct/table from a reusable corpus of `funhouse` code including reflection over "col" tags.
 
 I had fun.
-I stretched; creating a "col" tag with reflection was interesting and informative.
+I stretched; creating a "col" tag with reflection was a new one for me.
 It works!
 Maybe it's even a good start on something worthy?
 
-In the end though, I'm an engineer at heart.
-When it comes to code, this means simpler is my preference.
-So I've parked the well-separated approach and we'll look at something a bit clunkier and considerably more accessible for the remainder of the post.
-
-Examples:
- - [reflecting/main.go](https://github.com/clarktrimble/funhouse/blob/main/examples/reflecting/main.go)
- - [generable/main.go](https://github.com/clarktrimble/funhouse/blob/main/examples/generable/main.go) (as seen below)
+In the end, I preferred the considerably more accessible, if clunkier, code from earlier in the project.
+We'll stick with this simpler, kinder version of the code for the remainder of the post. 
 
 ## Column-Oriented Golang
 
 Let's take a look at a row vs column oriented struct representing a message.
 
-Here's a row-oriented msg struct:
+Here's a row-oriented message struct:
 
 ```go
 // entity/msg.go
@@ -180,7 +181,7 @@ type MsgCols struct {
 ```
 
 Nothing mind-blowing; the slices surely are column-oriented.
-Depending on our use case, we can easily transform between the two.
+If need be, we can easily transform between the two.
 
 
 #### TL;DR
@@ -191,7 +192,7 @@ This is a good summary of "column-oriented" writ small in Golang.
 
 ### Insert / Put
 
-Diving deeper into the Golang, `PutColumns` inserts messages into the table a chunk at a time:
+Diving deeper into the Golang, the `PutColumns` function inserts messages into the table a chunk at a time:
 
 ```go
 // examples/generable/msg/msg.go
@@ -247,9 +248,11 @@ func Input(names []string, byName map[string]proto.Column) (input proto.Input) {
 }
 ```
 
+Along with a very similar `Results` function, this lets us avoid repeating ourselves when it comes to delineating the columns we might want to insert or read to/from a table.
+
 ### Read / Get
 
-`GetColumns` reads messages from the table a block at a time:
+The `GetColumns` function reads messages from the table a block at a time:
 
 ```go
 // examples/generable/msg/msg.go
@@ -282,9 +285,9 @@ func GetColumns(ctx context.Context, client *ch.Client, qSpec string) (mcs *enti
 ```
 
 The tricky part for me was to (mostly) ignore `block` in the handler and read from the enclosed `results`.
-Again, the data is handled block-wise enabling column-oriented efficiency.
+Again, the data is handled block-wise enabling the potential for column-oriented efficiency.
 
-Per-column appends use type-specific helpers.
+The per-column append lines use type-specific helpers.
 Let's have closer look at one of them:
 
 ```go
@@ -303,13 +306,14 @@ func Dt64Values(cr proto.ColResult) (vals []time.Time) {
 }
 ```
 
-One of these will be needed for each type of `proto.Column` used in the table.
+One of these is be needed for each type of `proto.Column` used in a table.
 
 ## The End
 
-Whew; a lot of code there!
+Whew; plenty of code there!
 I hope it helps to convey a sense about column-orientation.
-I think the rubber meets the road in the OnInput and OnResults callbacks.
+
+The rubber meets the road in the `OnInput` and `OnResults` callbacks.
 Both move blocks of data via the column-oriented `MsgCols` struct.
 
 ### Leaving Room for Improvement
@@ -329,11 +333,11 @@ I suspect the commonality of calling `AppendArr` or `Rows/Row` after the type as
 
 #### Indexing
 
-Would be informative to index the data and do something more than select all.
+Would be informative to create indexes and do something more than select all.
 Especially pushing things to the point where additional tables are needed.
 
 ### Thanks
 
-Hey, you made it to the end!
+Hey, we made it to the end!
 Thank you for reading : )
 
