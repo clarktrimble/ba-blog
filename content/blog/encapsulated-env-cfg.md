@@ -11,34 +11,38 @@ In this post we'll take a look at passing configuration via environmental variab
 
 ```
 
-    ┌─────────────────┐                     ┌────────────────────────────────┐
-    │ package one     │                     │ package main                   │
-    │                 │                     │                                │
-    │ Config{         ├────────────────────►│ Config{                        │
-    │  Port: int      │                     │  One: *one.Config              │
-    │ }               │     ┌──────────────►│  Two: *two.Config              │
-    │                 │     │               │  DryRun: bool                  │
-    └─────────────────┘     │               │ }                              │
-                            │               │                                │
-                            │               │ envconfig.Process("pfx", &cfg) │
-    ┌─────────────────┐     │               └────────────────────────────────┘
-    │ package two     │     │
-    │                 │     │
-    │ Config{         ├─────┘                Usage:
-    │  User: string   │                      KEY                TYPE
-    │ }               │                      PFX_DRYRUN         Bool
-    │                 │                      PFX_ONE_PORT       Integer
-    └─────────────────┘                      PFX_TWO_USER       String
+┌─────────────────┐                   ┌────────────────────────────────┐
+│ package one     │                   │ package main                   │
+│                 │                   │                                │
+│ Config{         ├──────────────────►│ Config{                        │
+│  Port: int      │                   │  One: *one.Config              │
+│ }               │     ┌────────────►│  Two: *two.Config              │
+│                 │     │             │  DryRun: bool                  │
+└─────────────────┘     │             │ }                              │
+                        │             │                                │
+                        │             │ envconfig.Process("pfx", &cfg) │
+┌─────────────────┐     │             └────────────────────────────────┘
+│ package two     │     │
+│                 │     │
+│ Config{         ├─────┘                Usage:
+│  User: string   │                      KEY                TYPE
+│ }               │                      PFX_DRYRUN         Bool
+│                 │                      PFX_ONE_PORT       Integer
+└─────────────────┘                      PFX_TWO_USER       String
 
 ```
 
 ## Configuration via Environment
 
-The idea here is to pass config to an application by way of envars rather than command line options or file.
+The idea is to pass config to an application by way of environment variables rather than command line options or file.
 
 Command line options get out of hand along with the number of configurables.
 As a project scales up, the cost of also managing config files scales as well.
-Envars are simple key-value pairs just there in, ah, the environment.
+Environment variables are simple key-value pairs just there in, ah, the environment.
+
+More complex configuration objects represented by a single string can be challenging for humans to read.
+Often they can be decomposed into simpler structures or perhaps even viewed as occupying a gray-area between configuration and run-state.
+But for an app with a big appetite for complex configuration, files might be the way to go.
 
 Scaled infrastructures built on containerization have good support for environmental config, perhaps even favoring the approach.
 The generally sane Twelve-Factor App site has a good [take](https://12factor.net/).
@@ -105,8 +109,8 @@ When all goes well, `cfg` will be left looking like:
 
 ```go
 main.Config{
-  Port:       8080, 
-  DbUserName: "midboi", 
+  Port:       8080,
+  DbUserName: "midboi",
   DryRun:     true,
 }
 ```
