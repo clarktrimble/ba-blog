@@ -39,7 +39,7 @@ A quote from their "Why so fast?" page:
 ### Column Oriented
 
 Many aspects contributing to the performance talked up by ClickHouse are beyond the scope of this post, and "column-oriented" is in the tag-line and therefore likely to be a heavy hitter.
-Columns of table are stored apart from each other, which allows for better compression and so forth.
+Columns of a table are stored apart from each other, which allows for better compression and so forth.
 
 Where column-oriented started to click for me was in a gem of an article about [sparse primary indexes](https://clickhouse.com/docs/en/optimize/sparse-primary-indexes).
 In describing how the primary and secondary indexes behave, one is necessarily exposed to the granular, or blocky, nature of how data is written and read.
@@ -50,7 +50,7 @@ Typically these blocks, or granules, are as large as 8192 records, almost 3 orde
 Of course, you can write a query that returns a single row, but ClickHouse will grab at least one block, or quite possibly all of them if your indexing doesn't support it, and discard the rest of the data.
 However, when you want data in bulk, a system built around getting and putting blocks of it can out-perform one that is not.
 
-Ok, column-oriented bulk, this is good for ?.., well -- analysis.
+OK, column-oriented bulk, this is good for ?.., well -- analysis.
 Say you've got weblogs of the form: timestamp, domain, path, response code, and elapsed time.
 An aggregation can be used to transform the logged data into stats like requests per unit time, or paths taking longer than they did yesterday to respond.
 And those or other stats can be rolled up for higher-level views.
@@ -124,10 +124,7 @@ Yes!
 
 #### Step Two: get stuff out (programmatically)
 
-Um, surprisingly, I'm not finding an example for this.
-
-Not to worry.
-I'm up for a challenge!
+Um, surprisingly, I'm not finding an example for this one. Challenge accepted!
 
 ### Wrong Turn
 
@@ -146,9 +143,9 @@ We'll stick with this simpler, kinder version of the code for the remainder of t
 
 ## Column-Oriented Golang
 
-Let's take a look at a row vs column oriented struct representing a message.
+Let's take a look at a row-oriented struct vs a column-oriented struct representing messages.
 
-Here's a row-oriented message struct:
+Here's row-oriented:
 
 ```go
 // entity/msg.go
@@ -164,6 +161,8 @@ type Msg struct {
         Tags      []string
 }
 ```
+
+One instance corresponds to one row.
 
 And the equivalent column-oriented one:
 
@@ -181,14 +180,14 @@ type MsgCols struct {
 ```
 
 Nothing mind-blowing; the slices surely are column-oriented.
+
 If need be, we can easily transform between the two.
 
 
 #### TL;DR
 
 As we'll see below, the column-oriented struct comes in handy with `ch-go`.
-
-This is a good summary of "column-oriented" writ small in Golang.
+If you're in a hurry, it's a good summary of "column-oriented" writ small in Golang.
 
 ### Insert / Put
 
