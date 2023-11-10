@@ -1,6 +1,6 @@
 ---
 title: Gandi and Netlify
-description: The domain name system is your friend.
+description: Coordinating Gandi and Netlify for a budget friendly domain name
 date: 2023-09-26
 tags:
   - blog

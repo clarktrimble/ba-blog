@@ -1,6 +1,6 @@
 ---
 title: Vue3 and Protobuf
-description: Circa September 2023
+description: Investigate Protobuf as an approach to API-First with Vue3 on the front-end
 date: 2023-09-23
 tags:
   - golang

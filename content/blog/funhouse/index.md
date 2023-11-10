@@ -1,6 +1,6 @@
 ---
 title: FunHouse
-description: ClickHouse and Low-Level Golang
+description: Getting a feel for ClickHouse column-orientation with a low-level Golang client
 date: 2023-11-08
 tags:
   - golang
@@ -8,9 +8,9 @@ tags:
 layout: layouts/post.njk
 ---
 
-In this post we'll take a look at ClickHouse and explore it's columnar nature via Golang.
-
 {% image "./clickhouse.png", "Abstract Columns" %}
+
+In this post we'll take a look at ClickHouse and explore it's columnar nature via Golang.
 
 ## ClickHouse
 
@@ -39,7 +39,7 @@ A quote from their "Why so fast?" page:
 ### Column Oriented
 
 Many aspects contributing to the performance talked up by ClickHouse are beyond the scope of this post, and "column-oriented" is in the tag-line and therefore likely to be a heavy hitter.
-Columns of a table are stored apart from each other, which allows for better compression and so forth.
+Columns of a table are stored apart from each other, which allows for better compression, only reading columns of interest, and so forth.
 
 Where column-oriented started to click for me was in a gem of an article about [sparse primary indexes](https://clickhouse.com/docs/en/optimize/sparse-primary-indexes).
 In describing how the primary and secondary indexes behave, one is necessarily exposed to the granular, or blocky, nature of how data is written and read.

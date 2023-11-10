@@ -1,15 +1,15 @@
 ---
 title: LaTeX for a Résumé that Pops
-description: "Or at least looks pretty good."
+description: "Or at least one that looks clean and distinctive"
 date: 2023-10-26
 tags:
   - notes to self
 layout: layouts/post.njk
 ---
 
-Just a quick post so I'll never forget, or at least not lose the source, again :/
-
 {% image "./gutenberg.png", "LaTex sample output" %}
+
+Just a quick post so I'll never forget, or at least not lose the source, again :/
 
 ## TL;DR
 

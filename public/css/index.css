@@ -292,3 +292,25 @@ a[href].header-anchor:focus,
 h2 + .header-anchor {
 	font-size: 1.5em;
 }
+
+/* screwing around with cards ...  pct
+   https://developer.mozilla.org/en-US/docs/Web/CSS/Layout_cookbook/Card
+   which is not great since images don't line up and are not well sized 
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  grid-gap: 50px;
+}
+
+.card {
+  display: grid;
+  grid-template-rows: max-content 300px 1fr;
+}
+
+.card img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+*/

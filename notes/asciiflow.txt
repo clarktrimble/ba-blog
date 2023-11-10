@@ -1,0 +1,23 @@
+
+```
+
+ ┌─────────────────┐                  ┌────────────────────────────────┐
+ │ package one     │                  │ package main                   │
+ │                 │                  │                                │
+ │ Config{         ├─────────────────►│ Config{                        │
+ │  Port: int      │                  │  One: *one.Config              │
+ │ }               │     ┌───────────►│  Two: *two.Config              │
+ │                 │     │            │  DryRun: bool                  │
+ └─────────────────┘     │            │ }                              │
+                         │            │                                │
+                         │            │ envconfig.Process("pfx", &cfg) │
+ ┌─────────────────┐     │            └────────────────────────────────┘
+ │ package two     │     │
+ │                 │     │
+ │ Config{         ├─────┘               Usage:
+ │  User: string   │                     KEY                TYPE
+ │ }               │                     PFX_DRYRUN         Bool
+ │                 │                     PFX_ONE_PORT       Integer
+ └─────────────────┘                     PFX_TWO_USER       String
+
+```

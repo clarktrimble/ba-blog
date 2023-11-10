@@ -1,36 +1,15 @@
 ---
 title: Encapsulated Environmental Configuration
-description: Exporing the upside of envconfig in Golang.
+description: Configure Golang apps from the environment and show off a related approach to encapsulating configurables in dependencies
 date: 2023-10-19
 tags:
   - golang
 layout: layouts/post.njk
 ---
 
+{% image "./envconfig-diagram.png", "Config Diagram" %}
+
 In this post we'll take a look at passing configuration via environmental variables and an approach to encapsulating configuration in Golang.
-
-```
-
-┌─────────────────┐                   ┌────────────────────────────────┐
-│ package one     │                   │ package main                   │
-│                 │                   │                                │
-│ Config{         ├──────────────────►│ Config{                        │
-│  Port: int      │                   │  One: *one.Config              │
-│ }               │     ┌────────────►│  Two: *two.Config              │
-│                 │     │             │  DryRun: bool                  │
-└─────────────────┘     │             │ }                              │
-                        │             │                                │
-                        │             │ envconfig.Process("pfx", &cfg) │
-┌─────────────────┐     │             └────────────────────────────────┘
-│ package two     │     │
-│                 │     │
-│ Config{         ├─────┘                Usage:
-│  User: string   │                      KEY                TYPE
-│ }               │                      PFX_DRYRUN         Bool
-│                 │                      PFX_ONE_PORT       Integer
-└─────────────────┘                      PFX_TWO_USER       String
-
-```
 
 ## Configuration via Environment
 
