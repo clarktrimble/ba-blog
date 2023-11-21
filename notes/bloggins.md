@@ -25,6 +25,10 @@
 #### entity clean archicture
 #### placeholder
 
+### branchy modses quick tip
+
+### the case for small "SOLID" mods
+
 ## open api
 
     - ad-hoc api
