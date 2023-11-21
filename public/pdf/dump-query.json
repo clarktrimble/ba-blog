@@ -1,0 +1,2768 @@
+{
+  "request": {
+    "aggs": {
+      "outer": {
+        "aggs": {
+          "middle": {
+            "aggs": {
+              "inner": {
+                "avg": {
+                  "field": "vehicle_speed"
+                }
+              }
+            },
+            "terms": {
+              "field": "bus_id.keyword"
+            }
+          }
+        },
+        "date_histogram": {
+          "field": "ts",
+          "fixed_interval": "5m",
+          "min_doc_count": 1,
+          "time_zone": "UTC"
+        }
+      }
+    },
+    "query": {
+      "bool": {
+        "filter": [
+          {
+            "range": {
+              "ts": {
+                "gte": "2022-09-21T08:00:00Z",
+                "lte": "2022-09-21T16:59:59.999Z"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "size": 0
+  },
+  "response": {
+    "took": 1,
+    "timed_out": false,
+    "_shards": {
+      "total": 1,
+      "successful": 1,
+      "skipped": 0,
+      "failed": 0
+    },
+    "hits": {
+      "total": {
+        "value": 10000,
+        "relation": "gte"
+      },
+      "max_score": null,
+      "hits": []
+    },
+    "aggregations": {
+      "outer": {
+        "buckets": [
+          {
+            "key_as_string": "2022-09-21T08:00:00.000Z",
+            "key": 1663747200000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 0.99
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.93
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T08:05:00.000Z",
+            "key": 1663747500000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 1.73
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.826666666666667
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T08:10:00.000Z",
+            "key": 1663747800000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.44
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.0233333333333334
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T08:15:00.000Z",
+            "key": 1663748100000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.586666666666667
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 2.046666666666667
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T08:20:00.000Z",
+            "key": 1663748400000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.5633333333333335
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.8833333333333333
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T08:25:00.000Z",
+            "key": 1663748700000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.783333333333333
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.99
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T08:30:00.000Z",
+            "key": 1663749000000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.57
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 2.9266666666666667
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T08:35:00.000Z",
+            "key": 1663749300000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.85
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.536666666666667
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T08:40:00.000Z",
+            "key": 1663749600000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.196666666666666
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.78
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T08:45:00.000Z",
+            "key": 1663749900000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.8766666666666665
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 2.7133333333333334
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T08:50:00.000Z",
+            "key": 1663750200000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.333333333333333
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 1.34
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T08:55:00.000Z",
+            "key": 1663750500000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.05
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.94
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T09:00:00.000Z",
+            "key": 1663750800000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 0.35333333333333333
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.616666666666666
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T09:05:00.000Z",
+            "key": 1663751100000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 1.3033333333333332
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.38
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T09:10:00.000Z",
+            "key": 1663751400000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.85
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.886666666666667
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T09:15:00.000Z",
+            "key": 1663751700000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.873333333333333
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 1.8466666666666667
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T09:20:00.000Z",
+            "key": 1663752000000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.926666666666667
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.233333333333333
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T09:25:00.000Z",
+            "key": 1663752300000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.6466666666666665
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.46
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T09:30:00.000Z",
+            "key": 1663752600000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 0.26
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.453333333333333
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T09:35:00.000Z",
+            "key": 1663752900000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.9233333333333333
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.193333333333333
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T09:40:00.000Z",
+            "key": 1663753200000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.3933333333333335
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.153333333333333
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T09:45:00.000Z",
+            "key": 1663753500000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.166666666666667
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 1.2833333333333334
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T09:50:00.000Z",
+            "key": 1663753800000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.8133333333333335
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 0.7133333333333334
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T09:55:00.000Z",
+            "key": 1663754100000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.42
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.6566666666666667
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T10:00:00.000Z",
+            "key": 1663754400000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 0.05333333333333334
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.783333333333333
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T10:05:00.000Z",
+            "key": 1663754700000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 1.12
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.566666666666666
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T10:10:00.000Z",
+            "key": 1663755000000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.15
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.3533333333333335
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T10:15:00.000Z",
+            "key": 1663755300000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.593333333333334
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.026666666666667
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T10:20:00.000Z",
+            "key": 1663755600000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.36
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.3866666666666667
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T10:25:00.000Z",
+            "key": 1663755900000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.053333333333334
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.9
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T10:30:00.000Z",
+            "key": 1663756200000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 0.6433333333333333
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 2.9233333333333333
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T10:35:00.000Z",
+            "key": 1663756500000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.286666666666667
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.573333333333333
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T10:40:00.000Z",
+            "key": 1663756800000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.97
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.7933333333333334
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T10:45:00.000Z",
+            "key": 1663757100000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.92
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 2.9366666666666665
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T10:50:00.000Z",
+            "key": 1663757400000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.75
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 2.41
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T10:55:00.000Z",
+            "key": 1663757700000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.086666666666667
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.1
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T11:00:00.000Z",
+            "key": 1663758000000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 0.6866666666666666
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 6.2
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T11:05:00.000Z",
+            "key": 1663758300000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 2.32
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.39
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T11:10:00.000Z",
+            "key": 1663758600000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.65
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.1033333333333335
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T11:15:00.000Z",
+            "key": 1663758900000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.956666666666667
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 2.77
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T11:20:00.000Z",
+            "key": 1663759200000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.963333333333333
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.043333333333333
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T11:25:00.000Z",
+            "key": 1663759500000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.516666666666667
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.373333333333333
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T11:30:00.000Z",
+            "key": 1663759800000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 0.6433333333333333
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.8366666666666664
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T11:35:00.000Z",
+            "key": 1663760100000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.116666666666666
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.39
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T11:40:00.000Z",
+            "key": 1663760400000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.51
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.82
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T11:45:00.000Z",
+            "key": 1663760700000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.3133333333333335
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 0.44666666666666666
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T11:50:00.000Z",
+            "key": 1663761000000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.023333333333333
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 1.61
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T11:55:00.000Z",
+            "key": 1663761300000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.283333333333333
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.473333333333334
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T12:00:00.000Z",
+            "key": 1663761600000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 2.19
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.566666666666666
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T12:05:00.000Z",
+            "key": 1663761900000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 2.2666666666666666
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.463333333333333
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T12:10:00.000Z",
+            "key": 1663762200000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.073333333333333
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.723333333333334
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T12:15:00.000Z",
+            "key": 1663762500000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 6.13
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 2.3033333333333332
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T12:20:00.000Z",
+            "key": 1663762800000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.253333333333333
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.4133333333333336
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T12:25:00.000Z",
+            "key": 1663763100000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.786666666666667
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.17
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T12:30:00.000Z",
+            "key": 1663763400000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 0.35
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 2.6433333333333335
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T12:35:00.000Z",
+            "key": 1663763700000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.193333333333333
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.5
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T12:40:00.000Z",
+            "key": 1663764000000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.83
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.223333333333333
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T12:45:00.000Z",
+            "key": 1663764300000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.1933333333333334
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 2.4633333333333334
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T12:50:00.000Z",
+            "key": 1663764600000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.48
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 2.92
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T12:55:00.000Z",
+            "key": 1663764900000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.533333333333333
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.0933333333333333
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T13:00:00.000Z",
+            "key": 1663765200000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 2.31
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 6.1066666666666665
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T13:05:00.000Z",
+            "key": 1663765500000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 2.8366666666666664
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.763333333333334
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T13:10:00.000Z",
+            "key": 1663765800000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.3633333333333333
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.453333333333333
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T13:15:00.000Z",
+            "key": 1663766100000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 6.17
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 2.8
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T13:20:00.000Z",
+            "key": 1663766400000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.47
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.156666666666666
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T13:25:00.000Z",
+            "key": 1663766700000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.713333333333333
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.57
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T13:30:00.000Z",
+            "key": 1663767000000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 1.9733333333333334
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.386666666666667
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T13:35:00.000Z",
+            "key": 1663767300000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.986666666666667
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.3566666666666665
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T13:40:00.000Z",
+            "key": 1663767600000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.8533333333333335
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.6266666666666665
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T13:45:00.000Z",
+            "key": 1663767900000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.7866666666666666
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 2.68
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T13:50:00.000Z",
+            "key": 1663768200000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.793333333333333
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 2.9
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T13:55:00.000Z",
+            "key": 1663768500000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.1733333333333333
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.9
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T14:00:00.000Z",
+            "key": 1663768800000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 0.30666666666666664
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T14:05:00.000Z",
+            "key": 1663769100000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.126666666666667
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.01
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T14:10:00.000Z",
+            "key": 1663769400000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 6.6
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.8
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T14:15:00.000Z",
+            "key": 1663769700000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.2
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 1.7366666666666666
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T14:20:00.000Z",
+            "key": 1663770000000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.23
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.63
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T14:25:00.000Z",
+            "key": 1663770300000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.5866666666666664
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.683333333333333
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T14:30:00.000Z",
+            "key": 1663770600000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 0.4533333333333333
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.776666666666667
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T14:35:00.000Z",
+            "key": 1663770900000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.8233333333333333
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.32
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T14:40:00.000Z",
+            "key": 1663771200000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.4
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.8566666666666665
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T14:45:00.000Z",
+            "key": 1663771500000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 2.81
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.02
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T14:50:00.000Z",
+            "key": 1663771800000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.296666666666667
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.0166666666666666
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T14:55:00.000Z",
+            "key": 1663772100000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.29
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.8933333333333335
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T15:00:00.000Z",
+            "key": 1663772400000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.4
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.9766666666666666
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T15:05:00.000Z",
+            "key": 1663772700000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.9366666666666665
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.08
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T15:10:00.000Z",
+            "key": 1663773000000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.116666666666666
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.453333333333333
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T15:15:00.000Z",
+            "key": 1663773300000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.553333333333334
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 2.69
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T15:20:00.000Z",
+            "key": 1663773600000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.53
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.5766666666666667
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T15:25:00.000Z",
+            "key": 1663773900000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.6666666666666665
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.933333333333333
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T15:30:00.000Z",
+            "key": 1663774200000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 0.013333333333333334
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.83
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T15:35:00.000Z",
+            "key": 1663774500000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.31
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.23
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T15:40:00.000Z",
+            "key": 1663774800000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.2133333333333334
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.69
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T15:45:00.000Z",
+            "key": 1663775100000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.783333333333333
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.18
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T15:50:00.000Z",
+            "key": 1663775400000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.08
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.3633333333333333
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T15:55:00.000Z",
+            "key": 1663775700000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.6
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.316666666666666
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T16:00:00.000Z",
+            "key": 1663776000000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 2.7133333333333334
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.483333333333333
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T16:05:00.000Z",
+            "key": 1663776300000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.6933333333333334
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.63
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T16:10:00.000Z",
+            "key": 1663776600000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.15
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.5233333333333334
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T16:15:00.000Z",
+            "key": 1663776900000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.163333333333333
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 2.1
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T16:20:00.000Z",
+            "key": 1663777200000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.76
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.1766666666666667
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T16:25:00.000Z",
+            "key": 1663777500000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.803333333333334
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.89
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T16:30:00.000Z",
+            "key": 1663777800000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 0.4033333333333333
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.05
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T16:35:00.000Z",
+            "key": 1663778100000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.916666666666667
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.566666666666666
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T16:40:00.000Z",
+            "key": 1663778400000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.846666666666667
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 2.8733333333333335
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T16:45:00.000Z",
+            "key": 1663778700000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.2933333333333334
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 2.51
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T16:50:00.000Z",
+            "key": 1663779000000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 5.773333333333333
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 2.013333333333333
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "key_as_string": "2022-09-21T16:55:00.000Z",
+            "key": 1663779300000,
+            "doc_count": 600,
+            "middle": {
+              "doc_count_error_upper_bound": 0,
+              "sum_other_doc_count": 0,
+              "buckets": [
+                {
+                  "key": "B183",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 3.24
+                  }
+                },
+                {
+                  "key": "B208",
+                  "doc_count": 300,
+                  "inner": {
+                    "value": 4.326666666666667
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "error": "none"
+}
