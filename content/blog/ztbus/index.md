@@ -23,17 +23,17 @@ So rather than Jupyter Notebooks, Matlab, or other visualization related tools, 
 
 There's nothing particular about the ZTBus dataset with respect to the topic at hand.
 We need some grist for the aggregation mill and it's publicly [available](https://www.research-collection.ethz.ch/handle/20.500.11850/626723).
-The data is per-second and mostly numerical relating to such things as power consumtion, individual wheel velocities/steering angles, brake pad pressure, and so forth.
+The data is per-second and mostly numerical relating to such things as power consumption, individual wheel velocities/steering angles, brake pad pressure, and so forth.
 There's a recent [article](https://www.nature.com/articles/s41597-023-02600-6) from Nature for more on the dataset.
 
 ## TL;DR
 
 Elasticserch (ES) aggregations can be a challenge to handle from a Golang perspective.
-Both the queries and the results are represented as json objects and ES's use of values, rather than field names, as keys in places throws a wrench into the usual Golang json Marshal/Unmarshal.
+Both the queries and the results are represented as json objects and ES's use of values, rather than field names, as keys at points in the structure throw a wrench into the usual Golang json Marshal/Unmarshal.
 
-In this post, an approach of using templates to form queries and [gjson](https://github.com/tidwall/gjson) to parse results is demonstrated.
+In this post, an approach using templates to form queries and an alternative means of parsing results is demonstrated.
 
-The code presented below is available for reference on [GitHub](https://github.com/clarktrimble/ztbus).
+Companion code is available on [GitHub](https://github.com/clarktrimble/ztbus).
 
 ## Elasticsearch
 
@@ -48,14 +48,15 @@ Following the excellent standalone [instructions](https://www.elastic.co/guide/e
 docker run --name es01 --net elastic -p 9200:9200 -it -m 1GB docker.elastic.co/elasticsearch/elasticsearch:8.11.0
 ```
 
-Splat! Looks like I need to tweak a kernel setting first:
+**Splat!**
+
+Looks like I need to tweak a kernel setting first:
 
 ```bash
 sudo vi /etc/sysctl.conf
-
 ### adding "vm.max_map_count=262144"
-
 sudo sysctl -p
+
 docker rm es01
 docker run --name es01 --net elastic -p 9200:9200 -it -m 1GB docker.elastic.co/elasticsearch/elasticsearch:8.11.0
 ```
@@ -88,7 +89,7 @@ At some point my terminal was closed and I was able to restart the container in 
 docker start es01
 ```
 
-Next time, I'll try starting the container in the background and reset pw with exec:
+Next time, I'll try starting the container in the background to begin with and reset the password via exec:
 
 ```bash
 docker run --name es01 --net elastic -p 9200:9200 -d -m 1GB docker.elastic.co/elasticsearch/elasticsearch:8.11.0
@@ -98,7 +99,7 @@ docker exec -it es01 /usr/share/elasticsearch/bin/elasticsearch-reset-password -
 ### The End
 
 For the ES setup, that is.
-From here we'll start shoveling data into an index; no table setup or anything.
+From here, we'll start shoveling data into an index; no table setup or anything.
 ES just figures it out for us.
 
 In real life however, this would not be a good approach for a project expected to scale.
@@ -110,7 +111,7 @@ Many configurables lie just below the surface!
 
 From ZTBus we'll focus on `odometry_vehicleSpeed` over time for buses `B183` and `B208`.
 
-The struct we'll be using to soak up datums:
+The Golang struct we'll be using to soak up datums:
 
 ```go
 // ztbus.go
@@ -190,8 +191,8 @@ In any case the code is a simple as it is crude, unlikely to offer surprise, and
 ### Insert
 
 We'll be using Elastic's restful [Index API](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html), which provides for creating documents in an index one at a time.
-The [Bulk API](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html) would offer better performance and I'm confident ES has even more performant options lurking within thier copious documentation.
-We just want to demonstrate programmatic aggregation and can have a quick carrot juice or something while the machines get on with it.
+The [Bulk API](https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html) would offer better performance and I'm confident ES has even more performant options lurking within their copious documentation.
+We just want some indexed data and can have a quick carrot juice or something while the machines get on with it.
 
 Here's the heart of the matter:
 
@@ -213,9 +214,9 @@ func (es *Elastic) Insert(ctx context.Context, doc any) (err error) {
 }
 ```
 
-Where `Client` is a fairly vanilla restful json-api http client with support for marshalling requests and unmarshallig responses.
+Where `Client` is a fairly vanilla restful json-api http client with support for marshalling requests and unmarshalling responses.
 
-And `doc` is provided by:
+And `doc`s are pulled from the columnar representation with:
 
 ```go
 // ztbus.go
@@ -249,20 +250,20 @@ Have a look at the [code](https://github.com/clarktrimble/ztbus/blob/main/cmd/lo
 ### Aggregate
 
 Now that we've got some data indexed, we'll take a look at an aggregation.
-Let's say, .... avgerage speed over some interval for each bus.
-Even this can be mildly daunting when confronted by the copius aggregation [documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html) over at Elastic.
+Let's say, ... avgerage speed over some interval for each bus.
+Even this can be mildly daunting when confronted by the copious aggregation [documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html) over at Elastic.
 A cool trick is to use a Kibana dashboard to cook up something that's close and go from there on the programmatic side.
 
 #### - Kibana Aside -
 
 First of all, I'm a big fan.
 I've troubleshot many an issue via Kibana's Discovory mode, which provides a filterable view of records.
-We're going to look at Dashboard mode as a means of generating a starter aggreation query.
+We're going to look at Dashboard mode as a means of generating a starter aggregation query.
 
 You might want to skip over this section if you're already cool with the mysteries.
 
 
-Let's get rolling by generating a token and starting Kibana up in a container:
+We'll begin by generating an enrollment token and running Kibana in another container:
 
 ```bash
 docker exec -it es01 /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana
@@ -270,23 +271,23 @@ docker exec -it es01 /usr/share/elasticsearch/bin/elasticsearch-create-enrollmen
 docker run --name kib01 --net elastic -p 5601:5601 docker.elastic.co/kibana/kibana:8.11.1
 ```
 
-Point a browser to Kibana, plug in the enrollement token, and login as "elastic" user from above.
+Point a browser to Kibana, plug in the enrollment token, and login as "elastic" user from above.
 
-Be sure to create a "Data view" first if you haven't already done so.
-[Instructions](https://www.elastic.co/guide/en/kibana/current/data-views.html), or in bread crumbs:
+First create a "Data view":
+[instructions](https://www.elastic.co/guide/en/kibana/current/data-views.html), or in bread crumb form:
 
 **3bar (top-left button) > Discover > "Data View Menu" (just below 3bar) > Create a data view**
 
 - Name: something memorable
 - Index pattern: something that matches just the index(es) of interest
 - Timestamp field: ts
-- and Save
+- Save
 
 Now for the aggregation!:
 
 **3bar > Dashboard > Create a Dashboard > Add Panel > Aggregation based > Data table**
 
-Choose the Data view from above and monkey with an aggregation, for example:
+Choose the Data view from above and try out an aggregation, for example:
  - set the date range so that Count metric is not 0
  - change metric to Average and a field of interest
  - add a Split Rows bucket with Date Histogram and field "ts"
@@ -346,7 +347,7 @@ Golang, golang, golang ..
 
 ### Templating
 
-For programmatic aggs, we'll need a way to generate aggregation queries on the fly for variable date-ranges, etc.
+For programmatic aggregations, we'll need a way to generate aggregation queries on the fly for variable date-ranges, etc.
 Hmmm, perhaps a template will do the job?:
 
 ```yml
@@ -382,13 +383,14 @@ The query will:
  - bucket the interval buckets by bus_id
  - and finally get the average speed for a bus in an interval
 
-Note the presense of the keyword ".keyword".
+Note the presence of the keyword ".keyword".
 Recall mention of "configurables below the surface" above?
-When the data was thrown at an unconfigured index, Elastic decided to create the "bus_id" field as `text`, which is not availble for term aggregation.
+When the data was thrown at an unconfigured index, ES decided to create the "bus_id" field as `text`, which is not available for term aggregation.
 Luckily for us, it also created an nearly identical sub-field "keyword" that _is_ up for term aggregation.
 
 The template is in yaml rather than json to improve readability for complex queries.
-Compare this three-layer to the two-layer shown in json above.
+This three-layer aggregation is more compact, etc. than its two-layer forbear above.
+The wizardry is courtesy [github.com/ghodss/yaml](https://github.com/ghodss/yaml) which leverages the concept that json can be viewed as a subset of yaml.
 
 To pull this off, first the template is rendered and then converted to json:
 
@@ -473,9 +475,9 @@ Here's a snippet of what we get back:
           },
 ```
 
-Ouch! generally, and we have the pesky value-as-json-key thing again.
+Ouch! Generally, and we have the pesky value-as-json-key thing again.
 
-[gjson](https://github.com/tidwall/gjson) to the rescue:
+[github.com/tidwall/gjson](https://github.com/tidwall/gjson) to the rescue:
 
 ```go
 func (svc *Svc) AvgSpeed(ctx context.Context, data map[string]string) (avgs ztbus.AvgSpeeds, err error) {
@@ -509,7 +511,7 @@ func (svc *Svc) AvgSpeed(ctx context.Context, data map[string]string) (avgs ztbu
 
 In the `for` loops, we see gjson making short work of pulling the data we're after from the query result and presenting us with a tidy `ztbus.AvgSpeeds` object.
 
-Of course, this code is irretrievably coupled to the `"avgspeed"` agg query template.
+Of course, this code is irretrievably coupled to the `"avgspeed"` aggregation query template but my hope is to isolate this to the `AvgSpeed` method in a service-layer package dedicated to the ZTBus dataset.
 
 ### Putting it all Together
 
@@ -531,7 +533,7 @@ Where [aggregate](https://github.com/clarktrimble/ztbus/blob/main/cmd/aggregate/
 We've had a whirlwind introduction to ES and its aggregations to set the stage for:
 
  - templated queries
- - unmarshalled extraction of data from results
+ - non-marshalled extraction of data from results
 
 Both of which offer a workable, pragmatic even, approach to exposing the considerable power of programmatic aggregation available with Golang.
 
