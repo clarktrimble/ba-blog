@@ -250,7 +250,7 @@ Have a look at the [code](https://github.com/clarktrimble/ztbus/blob/main/cmd/lo
 ### Aggregate
 
 Now that we've got some data indexed, we'll take a look at an aggregation.
-Let's say, ... avgerage speed over some interval for each bus.
+Let's say, ... average speed over some interval for each bus.
 Even this can be mildly daunting when confronted by the copious aggregation [documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html) over at Elastic.
 A cool trick is to use a Kibana dashboard to cook up something that's close and go from there on the programmatic side.
 
