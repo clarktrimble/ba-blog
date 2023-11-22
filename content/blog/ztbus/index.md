@@ -14,7 +14,7 @@ Today we'll investigate programmatic access to Elasticsearch aggregations via Go
 
 ### Programmatic You Say?
 
-Aggregations are a powerful means for utilizing data both as a precursor to visualizations and as a means to inform automation.
+Aggregations are a powerful means for utilizing data both as a precursor to visualizations and as a path to informing automation.
 Classic examples include finding top-talkers and long-duration responders.
 
 So rather than Jupyter Notebooks, Matlab, or other visualization related tools, we'll be aggregating with Golang for something approaching a datacenter-ready solution.
@@ -293,7 +293,7 @@ Choose the Data view from above and try out an aggregation, for example:
  - add a Split Rows bucket with Date Histogram and field "ts"
  - Update
 
-And, with some luck, you'll get see a table with data!
+And, with some luck, you'll see a table with data!
 
 Are you still with me?
 One last step to get the aggregation query ...
@@ -480,6 +480,7 @@ Ouch! Generally, and we have the pesky value-as-json-key thing again.
 [github.com/tidwall/gjson](https://github.com/tidwall/gjson) to the rescue:
 
 ```go
+// svc.go
 func (svc *Svc) AvgSpeed(ctx context.Context, data map[string]string) (avgs ztbus.AvgSpeeds, err error) {
 
   query, err := svc.Repo.Query("avgspeed", data)
