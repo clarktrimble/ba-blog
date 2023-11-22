@@ -1,0 +1,71 @@
+vm.max_map_count=262144
+
+trimble@tartu:~$ sudo vi /etc/sysctl.conf
+trimble@tartu:~$
+trimble@tartu:~$
+trimble@tartu:~$ sudo sysctl -p
+vm.max_map_count = 262144
+
+## kibana
+
+went smooth with enrollment token and es/pw creds
+
+### link!:
+
+http://tartu:5601/app/r/s/tySes 
+
+
+agggggg:
+
+{
+  "aggs": {
+    "2": {
+      "date_histogram": {
+        "field": "ts",
+        "calendar_interval": "1m",
+        "time_zone": "America/Chicago",
+        "min_doc_count": 1
+      },
+      "aggs": {
+        "1": {
+          "avg": {
+            "field": "vehicle_speed"
+          }
+        }
+      }
+    }
+  },
+  "size": 0,
+  "fields": [
+    {
+      "field": "ts",
+      "format": "date_time"
+    }
+  ],
+  "script_fields": {},
+  "stored_fields": [
+    "*"
+  ],
+  "runtime_mappings": {},
+  "_source": {
+    "excludes": []
+  },
+  "query": {
+    "bool": {
+      "must": [],
+      "filter": [
+        {
+          "range": {
+            "ts": {
+              "format": "strict_date_optional_time",
+              "gte": "2019-06-24T08:06:36.888Z",
+              "lte": "2019-06-24T18:12:00.526Z"
+            }
+          }
+        }
+      ],
+      "should": [],
+      "must_not": []
+    }
+  }
+}
