@@ -63,7 +63,7 @@ docker run --name es01 --net elastic -p 9200:9200 -it -m 1GB docker.elastic.co/e
 
 That did the trick!  Now the above container starts ES and spits out some credentials, which I put in a safe place.
 
-Let's check that its responding on 9200:
+Check that it's responding on 9200:
 
 ```bash
 $ export ELASTIC_PASSWORD=top*secret
@@ -83,7 +83,7 @@ $ curl -k -u elastic:$ELASTIC_PASSWORD https://localhost:9200
 
 Woot!
 
-At some point my terminal was closed and I was able to restart the container in the background with:
+At some point the terminal was closed and I restarted the container in the background with:
 
 ```bash
 docker start es01
