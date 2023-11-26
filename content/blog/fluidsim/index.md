@@ -10,7 +10,7 @@ layout: layouts/post.njk
 
 {% image "./fluidsim.png", "gray scale fluid simulation" %}
 
-Wherein I show off a Golang fluid simulation.
+Showing off a Golang implementation of Joe Stam's fluid simulation algorithm.
 
 ### Joe Stam
 
@@ -19,7 +19,7 @@ It's a fun game, totally built around the fluids.
 
 Fast-forward to June of this year.
 I'm sat in a lovely public [library](https://www.openstreetmap.org/#map=18/60.23118/24.93314) of suburban Helsinki, digging up ideas for a gamey sort of project.
-The now teenage boy sleeps in :)
+The now teenage boy, is still sleeping in our nearby room :)
 
 And up pops, [Real-Time Fluid Dynamics for Games](http://graphics.cs.cmu.edu/nsp/course/15-464/Fall09/papers/StamFluidforGames.pdf).
 Looks workable!  I've seen Stam's name mentioned quite a lot in relation to fluid simulation and the paper has a more or less complete implementation.
@@ -179,6 +179,13 @@ WebAssembly.instantiateStreaming(fetch("/public/fluidsim.wasm"), go.importObject
 It's ........................ [fluidsim browser-edition](/pdf/main.html)
 
 Kind of a cool toy, yeah?
+
+### Caveats
+
+Already lackluster performance took a hit with WASM.
+I cranked the grid size down from 80 to 40 to keep things moving along.
+
+Almost certainly won't work on a phone, as I've only handled mouse events.
 
 ## Postscript
 

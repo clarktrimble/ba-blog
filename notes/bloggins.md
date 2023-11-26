@@ -2,6 +2,10 @@
 
 ## golang
 
+### fatih pool for logs
+
+### cfgstate via long poll
+
 ### time tricks
 
     - civil time
