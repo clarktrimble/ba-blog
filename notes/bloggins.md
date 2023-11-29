@@ -33,6 +33,15 @@
 
 ### the case for small "SOLID" mods
 
+### MVP mods aka minimal code reuse
+
+All about reuse of code at the smallest scales ..
+
+- sometimes mod (hondo)
+- sometimes copy anyway (redact)
+- sometimes don't want dep (minlog)
+
+
 ## open api
 
     - ad-hoc api
