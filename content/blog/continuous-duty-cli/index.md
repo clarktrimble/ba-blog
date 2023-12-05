@@ -1,6 +1,6 @@
 ---
-title: Continuous Duty CLI
-description: Common features of industrial strength command-line utilities.
+title: Continuous Duty Command-Line
+description: Common features of industrial strength utilities
 date: 2023-12-03
 tags:
   - golang
@@ -10,26 +10,29 @@ layout: layouts/post.njk
 
 {% image "./continuous.png", "An Electric Motor" %}
 
-In this post, I'll enumerate, elaborate, and demonstrate features of command-line utilites that might come in handy while operating in an industrial setting such as the datacenter, cloud, or serverless.
+In this post, I'll enumerate, elaborate, and demonstrate features of command-line utilities that might come in handy while operating in an industrial setting such as the datacenter, cloud, or serverless.
 
 ## What, When, Where, ...
 
 Often times we think of command-line utilities in terms of stop-gap solutions; just a quick script to tide us over.
 Almost as often, we'll wind up automating its periodic or event-triggered invocation, or at least write up some documentation so that others can share in the early morning fun :)
 
-Whatever the path, once the application becomes part of the process, we'll soon find that many features of an infrastructure's services are also very helpful in this situation.
-Most of these revolve around logging, a subject near and dear to my heart, so let's jump in there!
+Ahh, am I blurring the line here?
+After all a service can be run from the command-line?
+True, but in this post I mean to discuss applications expected to start, do stuff, then stop; and "batch" has had, like, zero cachet for a few decades, lol.
 
-// Todo: kibana caps showing json blob and context filter
+Whatever the path or terminology, once the application becomes part of the process, we'll soon find that features typical for services are also very helpful in this situation.
+Many revolve around logging, a subject near and dear to my heart, so let's jump in there!
+
 
 ## Log, log, log
 
-The importance of logging from the command-line becomes apparent as soon as we think of running in the context of operating an infrastructure or service in production.  When did the "thing" last run?  How did it go?  Why did it fail?  And so on.
+The importance of logging from a command-line application becomes apparent as soon as we think of running in the context of operating an infrastructure or service in production, particularly at scale.  When did the "thing" last run?  How did it go?  Why did it fail?  And so on/forth.
 
 ### Structured
 
 The logs emitted __shall__ be structured.
-Oops, I've gotten on my high horse, but honeslty ...
+Oops, I've gotten on my high horse, but honestly ...
 
 High-horses aside, this generally means a string for a field name, and something useful for a value.
 Only taking it one layer deep usually works well.
@@ -51,15 +54,15 @@ A tidy example of a structured log message:
 ```
 
 At its most basic it's made up of:
-- timestamp: milliseconds are just barely not enough precision
-- level: "info" and "error" at the least(most?)
-- message: brevity is the soul of wit, lol, but think about filtering here and pushing stuff to other fields
+- timestamp: nanoseconds are overkill, milliseconds are just barely not enough precision
+- level: "info" and "error" at the least (maybe totally adequate?)
+- message: think of filtering here and put variables in their own fields
 
 ### Startup and Shutdown
 
 Startup is a good time to log:
- - configuration, redacted as needed
- - version of app, from source control
+ - configuration
+ - application version
 
 ```json
 {
@@ -72,7 +75,7 @@ Startup is a good time to log:
 }
 ```
 
-Shutdown lets us know the process exited cleanly.
+Shutdown lets us know the process exited cleanly:
 
 ```json
 {
@@ -88,6 +91,7 @@ Shutdown lets us know the process exited cleanly.
 
 Which is to say(ask), in what situation was the log message emitted?
 What other messages are relevant to it?
+Sample context fields might include:
 
  - `app_id` application emitting the log message
  - `run_id` per invocation
@@ -101,8 +105,8 @@ Here's a screen-cap of Kibana showing a request and it's particular response by 
 
 Note that `body` is nicely unescaped by Kibana; suitable for cut and paste should the need arise :)
 
-Filtering in this way can be a lifesaver when troubleshooting.
-When multiple applications share field names and logs are centralized, even more power to divine the incsrutable is unlocked.
+Filtering or pivoting on context fields can be a lifesaver when troubleshooting.
+If multiple applications share field names and logs are centralized, even more power to divine the inscrutable is unlocked.
 
 ### Request and Response
 
@@ -131,15 +135,47 @@ Don't underestimate this one when it comes to helping a wayward ticket to find a
 Of course when you start logging request and response bodies, things can get out of hand quickly.
 Simply truncating log values is an easy way to keep the lid on (as seen just above in the request log message).
 
-Would be nice to toggle fields as well, but I don't have an implementation to show off (yet!).
-Logging of the request and response bodies is without doubt the most extravagant of the features listed.
-And yet probably the one that has saved me the most cycles.
+Logging of the request and response bodies is without doubt the most extravagant of the features shown off today.
+If API interactions are running smoothly, we can turn off logging of the body:
+
+```bash
+~/proj/ztbus$ ZTB_SVC_DRYRUN=false ZTB_CLIENT_SKIPBODY=true bin/aggregate
+```
+
+```json
+{
+  "app_id": "agg-ztb",
+  "headers": "{\"Accept\":[\"application/json\"],\"Authorization\":[\"--redacted--\"],\"Content-Type\":[\"application/json\"]}",
+  "host": "localhost:9200",
+  "level": "info",
+  "method": "GET",
+  "msg": "sending request",
+  "path": "/ztbus003a/_search",
+  "query": "{}",
+  "request_id": "fb9M5jr",
+  "run_id": "q5ZohJs",
+  "scheme": "https",
+  "ts": "2023-12-05T18:24:55.185363534Z"
+}
+{
+  "app_id": "agg-ztb",
+  "elapsed": 21407478,
+  "headers": "{\"Content-Type\":[\"application/json\"],\"X-Elastic-Product\":[\"Elasticsearch\"]}",
+  "level": "info",
+  "msg": "received response",
+  "path": "/ztbus003a/_search",
+  "request_id": "fb9M5jr",
+  "run_id": "q5ZohJs",
+  "status": 200,
+  "ts": "2023-12-05T18:24:55.206763937Z"
+}
+```
 
 ### Elapsed
 
-Explicity logging an elapsed time can save a step or three later on as compared to calculating from messages timestamps.
+Explicitly logging an elapsed time can save a step later on as compared to calculating a duration from messages timestamps.
 
-Here we see how long it took to get a response from Elasticsearch:
+An example showing how long it took to get a response from Elasticsearch:
 
 ```json
 {
@@ -158,15 +194,16 @@ Here we see how long it took to get a response from Elasticsearch:
 ```
 
 Some units on `elapsed` might be nice, n'est-ce pas?
+In any case, it doesn't take much imagination to see how relevant `elapsed` could be when running arbitrary aggregations against a sprawling ES cluster.
 
-### Errors (never! lol)
+### Errors (never! : )
 
-Obviously these will be of some interest.
+These will be of some interest.
 
-Ideally errors should be actionable.
-Imagine a view into the logs showing stuff you want/need to deal with, like this week.
+Ideally, errors should be __actionable__.
+Imagine a view into the logs showing stuff you want/need to deal with, like today or this week.
 
-Top-level errrors may be trickier to log, particlarly startup, but we'll be glad to have them in the logs:
+Top-level errors may be trickier to log, particularly when failing to start up or crashing, but we'll be glad to have them in the logs when possible:
 
 ```json
 {
@@ -179,35 +216,41 @@ Top-level errrors may be trickier to log, particlarly startup, but we'll be glad
 }
 ```
 
-Notice the stack trace smooshed into the error string.
-This is another big time-saver whence troubleshooting.
+Notice the stack trace smooshed into the error string; another big time-saver!
+Would be nice for the trace to go into its own field though, yeah?
 
 ### Redaction
 
 Logging of secrets (for example, a password or token), is officially not a good idea.
-Redacting them from logs, and any other output, is good in that you can see that they are present, but without disclosing the secret itself.
+Redacting them from logs, and any other output, is good in that you can see they are present, but without disclosing the secret itself.
 
 Search for "-redacted-" on this page to see some examples.
-Conversly "5BWHV" (shhhhh!) is nowhere to be found.
-Take it easy, only a small fragment to an inaccessible throw-away dev server :)
+Conversely "5BW" (shhhhh!) is nowhere to be found.
+Easy now, it's a small fragment of a big password for an inaccessible throw-away dev server; should be ok? :)
 
 ### Transport
 
-Segueing from what to log, a quick note on how.
+Segueing from what to log .. ; a quick note on how.
 
 In the era of containerization, we can leave transport to the infrastructure and simply emit logs to stdout or stderr.
-Only when this really won't work should we think of adding the complexity of logging to the network from within.
+Only when this really won't work should we think of adding the complexity of logging to the network from within the application.
+
+Another benefit is the way this approach pushes us to deploy utilities to prod.
+Should things go horribly awry, it's better to have left a tidy change management trail.
 
 ## Configuration
 
 ### Via the Environment
 
-This works well in an industrial setting generally and no less so for a CLI.
-
+This works well in an industrial setting generally and no less so for a command-line application.
 See my post [Encapsulated Environmental Configuration](/blog/encapsulated-env-cfg/) and/or The Twelve-Factor App's [page](https://12factor.net/config) for more detail.
 
-Envconfig can be a tiny bit awkward when invoking a CLI manually, but quite workable none-the-less.
-Here I show loading a configuration into the environment, overriding dry-run, and the resulting sanity-check output with flag:
+Environmental configuration can be a tiny bit awkward or unfamiliar when invoking manually, but quite workable nonetheless.
+
+Here I show:
+ - loading a configuration into the environment
+ - overriding dry-run while asking for a config-dump via flag
+ - and the resulting sanity-check output
 
 ```bash
 ~/proj/ztbus$ . etc/ztb-secret.sh
@@ -237,13 +280,15 @@ Here I show loading a configuration into the environment, overriding dry-run, an
 }
 ```
 
+Sweet!, the json here is quite readable compared to an equivalent amount of config as flags and arguments.
+
+Hey, what's with the "-c" flag?; that's cheating!
+Maybe a little, but once the actual config is relegated to the environment we can think of a flag or two as meta-config?
+
+
 ### Usage
 
-There may be an entire section of the wiki devoted to an application's intracies.
-'May' is probably the key-word in the previous sentence.
-Wiki's, along with issue-tracking, fall victim to to vagaries of our collective organizational disfunctions with a surprising regularity.
-
-Should such a happenstance occur, a little help from the CLI will go a long way:
+A little help from the application can go a long way:
 
 ```bash
 ~/proj/ztbus$ ZTB_SVC_DRYRUN=false bin/load-ztbus -h
@@ -268,19 +313,39 @@ ZTB_SVC_DRYRUN             True or False                         stop short of h
 ZTB_DATAPATH               String                    true        path of ztbus data file for input
 ```
 
+One could include a small novel, or a link to the wiki, but the star here is the table of configurables.
+A good operator can intuit most of what they need to know from this, and, as it's generated from the code is almost certainly up-to-date :)
+The table is also a handy source for all the correctly spelled variable names with a quick copy/paste.
+
 ### Version
 
 How do we get the tidy version string seen above anyway?
+The magic of make!:
 
 ```make
+EXECS   := $(wildcard cmd/*)
+TARGETS := ${EXECS:cmd/%=%}
+
 BRANCH   := ${shell git branch --show-current}
 REVCNT   := ${shell git rev-list --count $(BRANCH)}
 REVHASH  := ${shell git log -1 --format="%h"}
 
 LDFLAGS  := -X main.version=${BRANCH}.${REVCNT}.${REVHASH}
+
+### other actions ommitted for clarity
+
+build: ${TARGETS}
+        @echo ":: Done"
+
+${TARGETS}:
+        @echo ":: Building $@"
+        go build -ldflags '${LDFLAGS}' -o bin/$@ cmd/$@/main.go
 ```
 
-In the Makefile does the trick in Golang.
+`BRANCH` and `REVCOUNT` are nice to have.
+`REVHASH` is all you really need to find _the_ code that exhibited such shocking behavior.
+
+`LDFLAGS` is, of course, Golang specific where `main.version` is kind of cool in that it will set `var version string` in any and all main packages built thusly.
 
 ## Rubber Meet Road
 
@@ -288,13 +353,49 @@ In the Makefile does the trick in Golang.
 
 The idea with a dry-run is to get as close as possible to making the change, logging all the things, and yet stopping short.
 
-At some point the big clean-up project, or similar, will go live in prod and it's quite comforting to a dry-run just prior.
+At some point the big clean-up project, or similar, will go live in prod and it's quite comforting to perform a dry-run just prior to taking the plunge.
+
+```bash
+~/proj/ztbus$ bin/load-ztbus 2>&1 | jq -s .[]
+```
+
+```json
+...
+{
+  "app_id": "load-ztb",
+  "count": 46641,
+  "level": "info",
+  "msg": "inserting records",
+  "run_id": "ImtV1UA",
+  "ts": "2023-12-04T18:12:53.401069163Z"
+}
+{
+  "app_id": "load-ztb",
+  "dry_run": "true",
+  "level": "info",
+  "msg": "stopping short",
+  "run_id": "ImtV1UA",
+  "ts": "2023-12-04T18:12:53.458551526Z"
+}
+...
+```
+
+Here we see `load-ztb` finding 46641 records and then stopping short just before it would have begun chucking them into ES.
 
 ### Throttle
 
 A throttle is very much in the spirit of dry-run, but on the other side of the divide.
-
 The idea with throttle is to perform some small portion of the changes and pause for feedback and monitoring before proceeding.
+
+I don't have an example to show off for this one because the `ztbus` project lacks a rather important characteristic.
+It's insert behavior is not __idempotent__.
+Which is to say that if I run the loader twice, we'll have two copies of each record in ES, not good.
+
+If however, we had a unique id for each record, ES can see this as an upsert or we could skip.
+In which case we could easily run load on subsets without fear of getting things into a snarl.
+
+I'm leaving this section in as a bit of a teaser.
+Throttling is cool for operations and idempotence is a fantastic property enabling it and many other simplifications.
 
 ### Exit Code
 
@@ -319,7 +420,9 @@ Many features are achieved without much (further) effort, thanks to:
 
 ## The End
 
-Obviously, the above opinious are my own, and are offered in the spirit of helpfulness and with the hope of provoking thought.
+Can you believe it?
+
+The above opinions are my own, and are offered in the spirit of helpfulness and with the hope of provoking thought.
 Shoot me an email if you'd like to get in touch!
 
 Thanks for reading :)
