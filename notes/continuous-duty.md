@@ -13,5 +13,5 @@
 - envconfig
 - log to stdout/err
 - dry_run
-- log errors, especially from main
+- log errors/trace, especially from main
 - app_id for fs!! :)
