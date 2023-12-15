@@ -18,6 +18,10 @@
 
 ### errors.Wrapf is good
 
+### lint lint lint, spell check comments!!!
+
+### ginkgo/gomega/moq/mock
+
 ### envconfig/launch
 
 - 12 factor goodness
