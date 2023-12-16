@@ -330,7 +330,8 @@ Ahh, now we're getting into matters of timing.
 The first line of defense is hidden away in `GetKv` which will send requests with `wait` as seen in the curl example above.
 
 Should that fail, say due to a fritzy service re-registering every few nanoseconds, the rate limiter will slow things down.
-This make me happy :)
+This makes me happy :)
+Any delay that the limiter does introduce is accumulated in `LimitDelay` for some visibility, although I'm not making use of it currently.
 
 Hashi has a nice [page](https://developer.hashicorp.com/consul/api-docs/features/blocking) discussing the use of Consul's blocking endpoints.
 
