@@ -11,21 +11,19 @@ layout: layouts/post.njk
 
 {% image "./generics.png", "Generic Brand Groceries" %}
 
-I've been on the lookout for a good opportunity to wield the "new" generics in Golang, well, since they made their surprise appearance in Go 1.18. (/sarc)
-
-I have noticed them getting put to good use here and there in libraries.
-And for a functional Golang style, [github.com/samber/lo](https://github.com/samber/lo) really puts the generics hammer down; nice.
+I've been on the lookout for a good opportunity to wield the "new" generics in Golang since they made their surprise appearance in Go 1.18. (/sarc)
+I have noticed them getting put to good use here and there in libraries and for a functional Golang style, [github.com/samber/lo](https://github.com/samber/lo) really puts the generics hammer down, nice.
 
 Anyway, my recent explorations with ClickHouse turned up just such an opportunity.
-In the post on [column-orientation](https://clarktrimble.online/blog/funhouse/), I wound up with two less-than-satisfactory approaches to using their low-level `ch-go` library:
- 1. reflect over a struct to divine column types and go forth with complexity
+In the post on [column-orientation](https://clarktrimble.online/blog/funhouse/), I wound up with two less-than-satisfactory approaches to using the low-level `ch-go` library:
+ 1. reflect over a struct to divine column names and go forth with complexity
  2. stuff ClickHouse logic into a package really about messages, simple but ugly
 
-In this post I'll share how a small dollop of generics triggered a series of improvements, transforming the duckling into, if not a swan, at least a Barnacle goose. (Really, they have them in Finland!)
+In this post I'll share how a small dollop of generics triggered a series of improvements, transforming the duckling into, if not a swan, maybe a Barnacle goose. (Really, they have them in Finland!)
 
 ## The Ugly
 
-As we're looking at improvement over time, a couple of references into the project's history might be in helpful:
+As we're looking at improvement over time, a couple of references into the project's history might be helpful:
  - [old and simple/ugly](https://github.com/clarktrimble/funhouse/tree/de8f5d339a36fe55d48bc66d4aa540e3969c6f7f) circa November 7, 2023
  - [new and improved](https://github.com/clarktrimble/funhouse/tree/2f4b9cfce47c857647944cb9e97a7dd50caef699) circa Dec 21, 2023
 
@@ -45,7 +43,7 @@ err = client.Do(ctx, ch.Query{
       switch col.Name {
       case "ts":
         mcs.Timestamps = append(mcs.Timestamps, fl.Dt64Values(col.Data)...)
-      // ... handle the rest of the columns by name
+      // ... more cols
       }
       col.Data.Reset()
     }
@@ -83,7 +81,7 @@ _Oh_, we'll need one of these for each type, not so good : (
 
 _And_ we build a slice here only to append to the slice we really want after returning : /
 
-Eventually, wandering the voluminous and sparsely documented halls of `ch-go`, I was able to get all the helpers looking more or less the same as this one.
+Eventually, wandering the voluminous and sparsely documented halls of `ch-go`, I had all the helpers looking more or less the same as above.
 They call `Rows()` for length and `Row()` for data, varying in the type asserted and the type returned.
 
 Feels like something a generic could help with .. ?
@@ -127,11 +125,16 @@ Here's how processing the "ts" column looks with a generic `Append` helper:
 
 Better :)
 
-Shout out to [Eli Bendersky](https://eli.thegreenplace.net/2021/generic-functions-on-slices-with-go-type-parameters/) for getting me off to a quick start with this.  Thanks Eli!
+Shout out to [Eli Bendersky](https://eli.thegreenplace.net/2021/generic-functions-on-slices-with-go-type-parameters/) for a nice article on generic slices.  Thanks Eli!
+
+### TL;DR
+
+This section is the punchline for making the world a better place through the judicious application of generics.
+From here, I follow my nose to a few more or less related improvements to the project.
 
 ## Generic Round Two
 
-Getting this far, traipsing around the `ch-go` docs once again, I stumbled upon:
+Getting this far, traipsing around the `ch-go` docs again, I stumbled upon:
 
 ```go
 type ColumnOf[T any] interface {
@@ -161,7 +164,7 @@ They've been defined with:
 
 ```go
   dataCols  = map[string]proto.Column{
-    "ts":              (&proto.ColDateTime64{}).WithLocation(time.UTC).WithPrecision(proto.PrecisionNano),
+    "ts": (&proto.ColDateTime64{}).WithLocation(time.UTC).WithPrecision(proto.PrecisionNano),
     // ... more cols
   }
 ```
@@ -173,8 +176,8 @@ Rearranging a little:
 
 ```go
 type Cols struct {
-  Ts          *proto.ColDateTime64
-  // ... the rest of the cols
+  Ts *proto.ColDateTime64
+  // ... more cols
 }
 
 type MsgTable struct {
@@ -184,7 +187,7 @@ type MsgTable struct {
 }
 ```
 
-We can still cajole the columns into an `Input` or `Results` struct for use with `ch.Client.Do` and wherever we've got an instance of MsgTable we can refer to the concrete type.
+We can still herd the columns into an `Input` or `Results` struct for use with `ch.Client.Do` and wherever we've got an instance of MsgTable we can refer to the concrete type.
 
 Here's how appending from the "ts" column looks with a concrete type handy:
 
@@ -237,13 +240,15 @@ func (mt *MsgTable) AppendFrom(count int, results proto.Results) (err error) {
     switch col.Name {
     case "ts":
       flt.Append(&mt.Data.Timestamps, mt.Cols.Ts)
-    // ... the rest of the cols
+    // ... more cols
     }
     col.Data.Reset()
   }
   return mt.Data.CheckLen()
 }
 ```
+
+With something quite similar on the insert side, where "chunking" code makes more of an appearance.
 
 Cool, it's starting to feel like everything has and is in its place! :)
 
@@ -253,13 +258,14 @@ But first, summing up the improvements:
  - replace per-type helpers with one generic helper
  - eliminate intermediate slice through which all results were copied
  - creep towards intended use of lib with `proto.ColumnOf`
+ - concrete column types
  - reusable ClickHouse chunking logic
 
 Funhouse is shaping up, but I cannot say I'm completely, like, in love.
 
 ### Tag Driven
 
-I felt my first effort at this was overly complex and I'm glad to have shelved it, but .. it's still sitting there on the shelf.
+My first effort at this was overly complex and I'm glad to have shelved it, but .. it's still sitting there on the shelf.
 The idea is to drive the code connecting a struct to `ch-go` via tags, à la `json`, etc.
 
 ```go
@@ -274,7 +280,7 @@ type MsgCols struct {
 }
 ```
 
-The appeal is a much [smaller](https://github.com/clarktrimble/funhouse/blob/2f4b9cfce47c857647944cb9e97a7dd50caef699/examples/reflecting/msgtable/msgtable.go) supporting `MsgTable` that focuses on table'y things.
+The appeal is a much [smaller](https://github.com/clarktrimble/funhouse/blob/2f4b9cfce47c857647944cb9e97a7dd50caef699/examples/reflecting/msgtable/msgtable.go) supporting `MsgTable` that can focus on table'y things.
 
 ### Queries
 
@@ -290,7 +296,7 @@ So far the queries supported are rather bland:
 This is partly due to the lack of an actual use case, yeah just screwing around so far :), and "query builders" tend towards the unsatisfying to implement?
 
 However, _there is_ a larger issue lurking here.
-If the columns in `results` don't match the columns specified in "select", `ch-go` returns an error.
+If the columns in `results` don't match the columns specified in the query's select phrase, `ch.Client.Do` returns an error.
 I'm thinking of two different fixes:
  1. make the results helper "select" aware
  2. query only one column at a time
