@@ -184,8 +184,8 @@ There's a previous [post](https://clarktrimble.online/blog/encapsulated-env-cfg/
 
 When a request comes in, we'll collect, format and respond with them.
 
-The baseline metrics for an observable Golang service can be from the runtime package.
-Traditionally these have been available via 'runtime.ReadMemStats', but go1.16 reduced overhead significantly with [runtime/metrics].
+The baseline metrics for an observable Golang service can be had from the runtime package.
+Traditionally these have been available via `runtime.ReadMemStats`, but go1.16 reduced overhead significantly with [runtime/metrics](https://pkg.go.dev/runtime/metrics).
 A few stats like ... will help us to feel good about our services behavior and health in the wild.
 
 Lets look at the metrics service layer:
@@ -257,16 +257,251 @@ Slot in the runtime collector, specify prometheus format and set a route for our
 
 I would like to point out the `HandleFunc` method in the router interface.
 It's meant to anticipate the new mux coming with go1.22.
-Thanks to Eli for a nice [post](https://eli.thegreenplace.net/2023/better-http-server-routing-in-go-122/) regarding this exciting develpment!
+Thanks to Eli Bendersky for a nice [post](https://eli.thegreenplace.net/2023/better-http-server-routing-in-go-122/) regarding this exciting develpment!
+
+Now we'll turn out attention to the runtime metrics themselves:
+
+```go
+var (
+  collectible = []metric{
+    {
+      long: "/cpu/classes/total:cpu-seconds",
+      name: "cpu_total",
+      unit: "seconds",
+      desc: "Total available CPU time",
+    },
+    // more stats ...
+}
+```
+
+We're specifying which stats to collect as a variable in our runtime package.
+Simple stuff, but it's fun to think about a use case where we had a need to handle dynamically ala [ConfigState](https://clarktrimble.online/blog/configstate/).
+
+Go forth and collect!:
+
+```go
+func (rt Runtime) Collect(ts time.Time) (pa entity.PointsAt, err error) {
+  samples := make([]metrics.Sample, len(collectible))
+  for i := range collectible {
+    samples[i].Name = collectible[i].long
+  }
+  metrics.Read(samples)
+
+  points, err := toPoints(samples)
+  if err != nil {
+    return
+  }
+
+  pa = entity.PointsAt{
+    Name:  name,
+    Stamp: ts,
+    Labels: entity.Labels{
+      {Key: "app_id", Val: rt.AppId},
+      {Key: "run_id", Val: rt.RunId},
+    },
+    Points: points,
+  }
+  return
+}
+```
+
+Build a sample slice per `runtime/metrics` in the stdlib, read, and convert them to our intermediate "entity".
+
+To round things out, the points helper:
+
+```go
+func toPoints(samples []metrics.Sample) (points []entity.Point, err error) {
+  points = make([]entity.Point, len(collectible))
+  for i, sample := range samples {
+
+    var value entity.Value
+    switch sample.Value.Kind() {
+    case metrics.KindUint64:
+      value = entity.Uint{Data: sample.Value.Uint64()}
+    case metrics.KindFloat64:
+      value = entity.Float{Data: sample.Value.Float64()}
+    default:
+      err = errors.Errorf("unknown go runtime stat type for: %s", sample.Name)
+      return
+    }
+
+    points[i] = entity.Point{
+      Name:  collectible[i].name,
+      Desc:  collectible[i].desc,
+      Unit:  collectible[i].unit,
+      Type:  "gauge",
+      Value: value,
+    }
+  }
+  return
+}
+```
+
+A lot of column-inches in the last two blocks!
+But hopefully easy enough to read. :)
+
+Of some small interest is the `Value` interface in `Point`.
+It embeds `fmt.Stringer` and supports ints and floats for now.
+Stringifying the values here would have worked as well, but hanging on to the numbers a little longer "feels" right.
+
+Another thing emerging from the above sprawl, is the structuring of related points in two layers.
+`PointsAt` holds common infomations and `Points` the gritty details.
+Seems to be working out well!
+
+Having belabored the runtime collector so thouroughly, I think we'll skip over the prometheus formatter and it's many `Sprintf`s and string builders.
+
+And at long last a snippet from main putting all this to work:
+
+```go
+  svc := stator.ExposeRuntime(appId, runId, rtr, lgr)
+  svc.AddCollector(diskusage.DiskUsage{Paths: []string{"/", "/boot/efi"}})
+  svc.AddCollector(wave.New())
+```
+
+Exposing the runtime metrics is a one-liner and I've snuck in a couple additional collectors to spice things up.
+
+Disk usage is interesting not only in the sense that running out is still a fan-fav failure mode, but it also provides a nice example of points which differ only by labels.  Example forthcoming just below!
+
+Wave is kind of a toy collector that emits series of sine waves, giving us something fun(?) to look at.
+I did have a good time writing it :), a-and a simple sine wave actually could be useful for integration testing.
+
+#### not collected at all
+
+Before we wrap up collection, a quick word about what's not being collected.
+
+For an api service, requests per endpoint and time spent handling those requests are _rather_ importand metrics.
+I've not mentioned them til now, because that information is in the logs and in my somewhat humble opinion stats which can be aggregated from the logs are best collected in such a manner.  Not trying to be orthodox or anything, I'm espousing the idea as it seems so much easier to fire and forget a log message rather than tracking all that within an otherwise focused service.
+
+Perhaps good grist for a future post? :)
+
+#### the metrics
+
+```bash
+$ curl localhost:8087/metrics
+
+# HELP gort_cpu_total_seconds Total available CPU time
+# TYPE gort_cpu_total_seconds gauge
+gort_cpu_total_seconds{app_id="stator",run_id="YNwO5Ul",process_id="175005"} 0.00 1704906955008
+
+# HELP gort_mem_total_bytes All memory mapped into the current process
+# TYPE gort_mem_total_bytes gauge
+gort_mem_total_bytes{app_id="stator",run_id="YNwO5Ul",process_id="175005"} 7969808 1704906955008
+
+# HELP gort_goroutines_count Count of live goroutines
+# TYPE gort_goroutines_count gauge
+gort_goroutines_count{app_id="stator",run_id="YNwO5Ul",process_id="175005"} 10 1704906955008
+### more go runtime stats ...
+
+# HELP du_used_percent Percentage of space on the filesystem in use
+# TYPE du_used_percent gauge
+du_used_percent{path="/"} 16.66 1704906955008
+du_used_percent{path="/boot/efi"} 1.14 1704906955008
+### more disk usage stats ...
+
+# HELP wave_sine Sine wave(s)
+# TYPE wave_sine gauge
+wave_sine{name="three_random"} -0.17 1704906955008
+wave_sine{name="square"} 0.39 1704906955008
+```
+
+## Discovery
+
+Our observable service needs "someone" to register with!
+
+Starting up a stand-alone Consul with docker:
+
+```bash
+docker run -d --name consul01 -p 8500:8500 hashicorp/consul:1.17
+```
+
+And after starting `stator`:
+
+{% image "./consul-stator.png", "Consul web ui showing registration of stator service" %}
+
+That was easy, thanks Hashi!
+
+// Todo: mumble about catalog vs service registration ...
+
+## Collection
+
+We'll need to do a little config for Prometheus to discover `stator` via Consul:
+
+```yaml
+global:
+  scrape_interval: 15s
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+  - job_name: "stator"
+    consul_sd_configs:
+      - server: '192.168.xxx.xxx:8500'
+        services:
+          - "stator"
+```
+
+and sneaking it in to a docker image:
+
+```docker
+FROM prom/prometheus:v2.48.1
+ADD prometheus.yml /etc/prometheus/
+```
+
+and go:
+
+```bash
+$ docker build -t prom01 -f prom.Dockerfile .
+$ docker run -d --name prom01 -p 9090:9090 prom01
+$ docker logs -f prom01
+```
+
+boom!:
+
+{% image "./prom-stator.png", "Prometheus web ui showing stator service as a target" %}
+
+// Todo: mumble about non-cluster
+
+## Vizualization
+
+Grafana ftw!:
+
+```bash
+$ docker run -d --name=graf01 -p 3000:3000 grafana/grafana-enterprise
+$ docker logs -f graf01
+```
+
+Grafana sells plugins to the otherwise free enterprise version?
+Anyway, you rock Grafana!
+
+Browse on over to port 3000, login with admin/admin, add Prometheus as a data source, Explore, choose "blah" and:
+
+{% image "./grafana-stator.png", "Grafana web ui showing stator service memory stats" %}
+
+Looks like `stator` is settling into a very modest nest of RAM after starting up.
+
+And for a little fun let's see how the sine wave collector turned out:
+
+{% image "./grafana-wave.png", "Grafana web ui showing stator service wave stats" %}
+
+The yellow is three random sine waves and green is the first four of the Fourier series converging on a square wave.
+Isn't it amazing that just four of them get this close to a square?
+I think I've been in love with applied math since seeing a demo of this way back in middle school. :)
 
 
 
 
 ## The End
 
-I hope the iterative nature today hasn't been too much of an exposé, lol.
+Wow, mega-post!
+To sum up, `stator` achieves observability by:
+ - registering with discovery
+ - punctisomthingy logging
+ - responding to a monitor endpoint
+ - responding to a metrics endpoint with info on how well it's behaving
 
-And, as always, I hope it's been informative and/or thought provoking.
+As such we could run thousands of them across a global infrastructure and keep up with all of them on a shoestring.
+
+Per usual, I hope it's been informative and/or thought provoking.
 Get in touch with me via email if you'd like :)
 
 Thanks for reading!
