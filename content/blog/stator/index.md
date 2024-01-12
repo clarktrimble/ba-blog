@@ -18,26 +18,26 @@ In addition to sporting the operable features shown off in [Continuous Duty](htt
  - is discovered by stats collection
  - responds to a `/metrics` endpoint
 
-For discovery we'll return to HashiCorp's lovely Consul service, but this time go beyond it's humble key-value store and dive into service discovery proper.
+For discovery we'll return to HashiCorp's lovely Consul service, but this time go beyond it's humble key-value store and register as a service with its agent api.
 
-For metrics we'll turn to the ubiquitous Prometheus.
+For stats collection, we'll opt for the ubiquitous Prometheus, discovering our service via Consul.
 
 And from there, who could resist a little Grafana for painless, svelt visualization.
 
 ## An Observable Service
 
-Just to mix things up, we'll take a look at the [code] before bringing things up for a demo.
+Just to mix things up, we'll take a look at the [code] before bringing up all the services for a demo.
 
 __But first, what and why observable?__
 
-A reasonable take on an observable serivce could be one that registers its presence and reports it's health by logging and responding to monitor/stats endpoints.
+A reasonable take on an observable serivce could be one that registers its presence and reports it's health and status by way of logging and responding to endpoints appropriately.
 
 As an infrasctucture scales up, such observability becomes more and more a factor in being able to efficiently operate.
 And, of course, everyone, senior managment included, loves a good visualization.
 
 ### Registration
 
-At first blush, this looks like a simple api "call" on startup, but what about _when_ the discovery service loses it's mind and forgets about us, or everything?
+At first blush, this looks like a simple api request on startup, but what about _when_ the discovery service loses it's mind and forgets about us, or everything?
 (Generally any event used to establish state wants to be backed by a synchronizing true-up.)
 
 A blunt, simple solution is to re-register periodically, and we'll take this approach here.
@@ -58,8 +58,9 @@ func (roster *Roster) Start(ctx context.Context, wg *sync.WaitGroup) {
 
 Register and start a worker in a goroutine, presumably to re-register, yawn, but check out that logging!
 
-The `Logger.WithFields` call adds a unique(ish) `worker_id` field to all messages logged with the returned `ctx`.
-An intrepid troubleshooter will have such for filtering as needed.
+The `Logger.WithFields` call adds a unique `worker_id` field to all messages logged with the returned `ctx`.
+An intrepid troubleshooter uniformly provided with such can quickly filter and pivot thier way to a picture of "what happened?".
+
 Of course, depending on a particular logger is a faux pas extraordinare in some circles and you'll be glad to know `Logger` shows up as an interface in the roster package.
 
 Now to re-register:
@@ -76,7 +77,6 @@ func (roster *Roster) work(ctx context.Context, wg *sync.WaitGroup) {
     select {
     case <-ticker.C:
       roster.register(ctx)
-
     case <-ctx.Done():
       roster.unregister(ctx)
       roster.Logger.Info(ctx, "worker stopped")
@@ -86,12 +86,11 @@ func (roster *Roster) work(ctx context.Context, wg *sync.WaitGroup) {
 }
 ```
 
-Golang channels at thier classic best! :)
+Golang channels at thier classic best!
 
-When the `ticker` fires, register (again), or when `ctx`'s `cancelFunc` is called (from a goroutine elsewhere), unregister and exit, but not before decrementing the waitgroup.
+When `ticker` fires, re-register, _or_ when `ctx`'s `cancelFunc` is called (from a goroutine elsewhere), unregister and exit, but not before decrementing the waitgroup.
 
 A tidy little worker indeed, but what about the actual register/unregister?
-
 Let's take a quick peek at `unregister` as it's a little more interesting:
 
 ```go
@@ -109,7 +108,7 @@ func (roster *Roster) unregister(ctx context.Context) {
 Turtles all the way down!!?
 
 Kinda, but first let me draw your attention to the `WithoutCancel` wrinkle.
-`ctx` is here so that we benifit from the logging fields hidden within, but it has already been cancelled, which can cause a problem in the http client that eventually sends the unregister request.
+`ctx` is passed in so that we benifit from the logging fields hidden within, but it has already been cancelled, which can cause a problem in the http client that eventually sends the unregister request.
 Squeaked by here, as `WithoutCancel` is new as of go1.21; thanks Golang maintainers!
 
 Back to those turtles:
@@ -125,8 +124,7 @@ type Registrar interface {
 Ahh, `Registrar` shows up as an interface in `roster`.
 
 It's reasonable to suppose this lets us change our mind and use etcd or something for discovery instead.
-It could happen.
-And it's nice to separate worker and register logics.
+It could happen, and it's nice to separate worker and register logics.
 
 B-but the immediate gold-plated payoff is in testibility.
 Roster's worker is hairy enough to properly unit test and it helps heaps that we can stop at simply checking that our mock was called as expected.
@@ -146,7 +144,7 @@ Expect(rc()[0].Svc).To(Equal(svc))
 
 ([moq](https://github.com/matryer/moq) and [gomega](https://onsi.github.io/gomega/#top) ftw!)
 
-Registering and Deregistering with Consul:
+Registering and Deregistering with Consul in particular:
 
 ```go
 // consul.go
@@ -171,8 +169,11 @@ func (csl *Consul) Unregister(ctx context.Context, svc entity.Service) (err erro
 }
 ```
 
-With the above benifits of resting upon a `Client` interface.
-While `SendObject` and its marshal/unmarshal help might be a bit much for grizzled gophers, I think I can make a solid case for the request/response logging seen in the implementation injected in main below.
+Resting on a `Client` interface here allows for testing with nary a Consul.
+
+I wonder if `SendObject` and its marshal/unmarshal help might be a bit much for grizzled gophers.
+Nice to have that tucked away somewhere though?
+And I think I can make a solid case for the request/response logging seen in the implementation injected in main below.
 
 I very much appreciate a simple-to-use api such as offerred by Consul (not at all looking at you etcd v3 ;).
 
@@ -189,17 +190,18 @@ rstr.Start(ctx, &wg)
 
 Triple injected goodness :)
 
-Check out [Encapsulated Environmental Configuration](https://clarktrimble.online/blog/encapsulated-env-cfg/) for more on the approach to config.
+Check out [Encapsulated Environmental Configuration](https://clarktrimble.online/blog/encapsulated-env-cfg/) if you'd like to know more more about `cfg`.
 
 ## Metrics
 
-When a request comes in, we'll collect, format and respond with them.
+When a request for stats comes in, we'll collect, format and respond.
 
 The baseline metrics for an observable Golang service can be had from the runtime package.
 Traditionally these have been available via `runtime.ReadMemStats`, but go1.16 reduced overhead significantly with [runtime/metrics](https://pkg.go.dev/runtime/metrics).
 A few stats like ... will help us to feel good about our services behavior and health in the wild.
+// Todo: rewrite ^^^
 
-Lets look at the metrics service layer:
+Diving into the code with a look at the service struct:
 
 ```go
 // stator.go
@@ -223,12 +225,12 @@ type Svc struct {
 }
 ```
 
-While this could be construed as overkill just to expose a few runtime stats, service layers of this sort keep things from getting jammed together and of course the usual interfacy benifits accrue.
+While this could be construed as overkill just to expose a few runtime stats, a service layer of this sort keep things from getting jammed together and of course the usual interfacy benifits accrue.
 
-Of particular note is `Collectors` which let us plug-in anything that can round up a few points.
+Of some note is `Collectors` which let us plug-in anything that can round up a few stats.
 Certainly overkill for runtime stats, but a portion of my motivation is to work through the general case for when one of the "kitchen-sink" collectors like [node-exporter](https://github.com/prometheus/node_exporter) is not a good fit.
 
-Actually do something (by handling a request):
+Alrighty, lets handle a request:
 ```go
 // stator.go
 func (svc *Svc) GetStats(writer http.ResponseWriter, request *http.Request) {
@@ -622,7 +624,7 @@ Browse on over to `http://your-docker-host-here:3000`, login with admin/admin, a
 
 {% image "./grafana-stator.png", "Grafana web ui showing stator service memory stats" %}
 
-Looks like `stator` is settling into a very modest pile of RAM after start-up.
+Looks like `stator` is settling into a modest pile of RAM after start-up.
 
 And for a little fun let's see how the sine wave collector turned out:
 
