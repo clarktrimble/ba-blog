@@ -12,38 +12,36 @@ layout: layouts/post.njk
 {% image "./stator.png", "A large electric generator" %}
 
 In this post, we'll take a look at an implementation of an observable Golang api service.
-In addition to sporting the operable features shown off in [Continuous Duty](https://clarktrimble.online/blog/continuous-duty-cli/), the service:
+In addition to sporting the operable features shown off in [Continuous Duty CLI](https://clarktrimble.online/blog/continuous-duty-cli/) (most notably logging), the service:
  - registers with discovery
  - responds to a `/monitor` endpoint
- - is discovered by stats collection
  - responds to a `/metrics` endpoint
 
 For discovery we'll return to HashiCorp's lovely Consul service, but this time go beyond it's humble key-value store and register as a service with its agent api.
 
 For stats collection, we'll opt for the ubiquitous Prometheus, discovering our service via Consul.
 
-And from there, who could resist a little Grafana for painless, svelt visualization.
+And from there, who can resist a Grafana for painless, svelt visualization?
+Not me, lol.
 
 ## An Observable Service
 
-Just to mix things up, we'll take a look at the [code] before bringing up all the services for a demo.
+Just to mix things up, we'll start by going over the [code](https://github.com/clarktrimble/stator) before bringing everything up for a demo.
 
 __But first, what and why observable?__
 
-A reasonable take on an observable serivce could be one that registers its presence and reports it's health and status by way of logging and responding to endpoints appropriately.
+A reasonable take on an observable serivce could be one that registers its presence and reports it's health by way of logging and responding to related endpoints.
 
 As an infrasctucture scales up, such observability becomes more and more a factor in being able to efficiently operate.
-And, of course, everyone, senior managment included, loves a good visualization.
+And everyone, senior managment included, loves a good visualization.
 
 ### Registration
 
-At first blush, this looks like a simple api request on startup, but what about _when_ the discovery service loses it's mind and forgets about us, or everything?
+At first blush, this looks like a simple api request on startup, but what about _when_ the discovery service loses it's mind and forgets about us?
 (Generally any event used to establish state wants to be backed by a synchronizing true-up.)
+A blunt, simple solution is to re-register periodically, and we'll go with that.
 
-A blunt, simple solution is to re-register periodically, and we'll take this approach here.
-One can imagine scenarios where a service needs to update metadata about itself with discovery, or maybe discovery is discomfited by superflous re-registers, but these are left as exercises for the reader.
-
-Ok, so we'll register on startup and re-register every so often:
+Starting the registration service:
 
 ```go
 // roster.go
@@ -59,9 +57,9 @@ func (roster *Roster) Start(ctx context.Context, wg *sync.WaitGroup) {
 Register and start a worker in a goroutine, presumably to re-register, yawn, but check out that logging!
 
 The `Logger.WithFields` call adds a unique `worker_id` field to all messages logged with the returned `ctx`.
-An intrepid troubleshooter uniformly provided with such can quickly filter and pivot thier way to a picture of "what happened?".
+An intrepid troubleshooter uniformly provided with the likes can quickly filter and pivot thier way to a picture of "what happened?".
 
-Of course, depending on a particular logger is a faux pas extraordinare in some circles and you'll be glad to know `Logger` shows up as an interface in the roster package.
+Of course, depending on a particular logger is a faux pas extraordinare in some circles and you'll be glad to know `Logger` shows up only as an interface in the roster package.
 
 Now to re-register:
 
@@ -88,10 +86,10 @@ func (roster *Roster) work(ctx context.Context, wg *sync.WaitGroup) {
 
 Golang channels at thier classic best!
 
-When `ticker` fires, re-register, _or_ when `ctx`'s `cancelFunc` is called (from a goroutine elsewhere), unregister and exit, but not before decrementing the waitgroup.
+When `ticker` fires, re-register, _or_ when the context's `cancelFunc` is called (from a goroutine elsewhere), unregister and exit, but not before decrementing the waitgroup.
 
-A tidy little worker indeed, but what about the actual register/unregister?
-Let's take a quick peek at `unregister` as it's a little more interesting:
+A tidy worker indeed, but what about the actual register/unregister?
+Let's take a quick peek at `unregister` as it's the more interesting case:
 
 ```go
 // roster.go
@@ -109,7 +107,7 @@ Turtles all the way down!!?
 
 Kinda, but first let me draw your attention to the `WithoutCancel` wrinkle.
 `ctx` is passed in so that we benifit from the logging fields hidden within, but it has already been cancelled, which can cause a problem in the http client that eventually sends the unregister request.
-Squeaked by here, as `WithoutCancel` is new as of go1.21; thanks Golang maintainers!
+Squeaked by here, as `WithoutCancel` is new for go1.21; thanks Golang maintainers!
 
 Back to those turtles:
 
@@ -122,29 +120,13 @@ type Registrar interface {
 ```
 
 Ahh, `Registrar` shows up as an interface in `roster`.
-
-It's reasonable to suppose this lets us change our mind and use etcd or something for discovery instead.
-It could happen, and it's nice to separate worker and register logics.
+It's reasonable to suppose this lets us change our mind and use something else for discovery instead.
+It could happen.
 
 B-but the immediate gold-plated payoff is in testibility.
 Roster's worker is hairy enough to properly unit test and it helps heaps that we can stop at simply checking that our mock was called as expected.
 
-With an interface it can be as easy as:
-
-```go
-// roster_test.go
-//go:generate moq -out mock_test.go . Registrar Logger
-
-rc := registrar.RegisterCalls
-
-Expect(rc()).To(HaveLen(1))
-Expect(rc()[0].Ctx).To(Equal(ctx))
-Expect(rc()[0].Svc).To(Equal(svc))
-```
-
-([moq](https://github.com/matryer/moq) and [gomega](https://onsi.github.io/gomega/#top) ftw!)
-
-Registering and Deregistering with Consul in particular:
+Registering and Deregistering with Consul:
 
 ```go
 // consul.go
@@ -169,37 +151,35 @@ func (csl *Consul) Unregister(ctx context.Context, svc entity.Service) (err erro
 }
 ```
 
-Resting on a `Client` interface here allows for testing with nary a Consul.
+Form up some data and make a request!
 
-I wonder if `SendObject` and its marshal/unmarshal help might be a bit much for grizzled gophers.
+Relying on the `Client` interface provides for testing with nary a Consul service running, woot.
+
+I wonder if `SendObject` and its marshalling help might be a bit much for some grizzled gophers.
 Nice to have that tucked away somewhere though?
-And I think I can make a solid case for the request/response logging seen in the implementation injected in main below.
+And we get request/response logging in the implementation injected in main.
 
-I very much appreciate a simple-to-use api such as offerred by Consul (not at all looking at you etcd v3 ;).
-
-Wrapping up registration with a snippet from main:
+We'll finish up registration with a snippet from main:
 
 ```go
-// main.go
-client := cfg.Client.NewWithTrippers(lgr)
-csl := cfg.Consul.New(client)
-rstr := cfg.Roster.New(cfg.Server.Port, csl, lgr)
+  // main.go
+  rtr := minroute.New(ctx, lgr)
+  rtr.HandleFunc("GET /monitor", delish.ObjHandler("status", "ok", lgr))
 
-rstr.Start(ctx, &wg)
+  client := cfg.Client.NewWithTrippers(lgr)
+  csl := cfg.Consul.New(client)
+  rstr := cfg.Roster.New(cfg.Server.Port, csl, lgr)
+
+  rstr.Start(ctx, &wg)
 ```
 
-Triple injected goodness :)
+Setup a monitor endpoint and start the triple-injected roster service.
 
-Check out [Encapsulated Environmental Configuration](https://clarktrimble.online/blog/encapsulated-env-cfg/) if you'd like to know more more about `cfg`.
+Check out the previous post on [Encapsulated Environmental Configuration](https://clarktrimble.online/blog/encapsulated-env-cfg/) to see more regarding `cfg`.
 
-## Metrics
+### Metrics Endpoint
 
 When a request for stats comes in, we'll collect, format and respond.
-
-The baseline metrics for an observable Golang service can be had from the runtime package.
-Traditionally these have been available via `runtime.ReadMemStats`, but go1.16 reduced overhead significantly with [runtime/metrics](https://pkg.go.dev/runtime/metrics).
-A few stats like ... will help us to feel good about our services behavior and health in the wild.
-// Todo: rewrite ^^^
 
 Diving into the code with a look at the service struct:
 
@@ -225,7 +205,7 @@ type Svc struct {
 }
 ```
 
-While this could be construed as overkill just to expose a few runtime stats, a service layer of this sort keep things from getting jammed together and of course the usual interfacy benifits accrue.
+While this could be construed as overkill just to expose a few runtime stats, a service layer of this sort helps to keep things from getting jammed together.
 
 Of some note is `Collectors` which let us plug-in anything that can round up a few stats.
 Certainly overkill for runtime stats, but a portion of my motivation is to work through the general case for when one of the "kitchen-sink" collectors like [node-exporter](https://github.com/prometheus/node_exporter) is not a good fit.
@@ -246,11 +226,10 @@ func (svc *Svc) GetStats(writer http.ResponseWriter, request *http.Request) {
 }
 ```
 
-Collect, format, write; a sensible handler, downshifting from the world wide web with aplomb.
-
+Collect, format, write; a sensible handler, downshifting from the world-wide-web with aplomb.
 `runCollectors` and `format` call the interface methods as you might expect.
 
-Lets take a look at a convinience method bringing things back to earth for our use case:
+There's a convinience method bringing things back to earth for the observaiblity case:
 
 ```go
 // stator.go
@@ -271,11 +250,16 @@ func ExposeRuntime(appId, runId string, rtr Router, lgr Logger) (svc *Svc) {
 
 Slot in the runtime collector, specify prometheus format and set a route for our handler, yay!
 
-I would like to point out the `HandleFunc` method in the router interface.
+I would like to highlight the `HandleFunc` method in the router interface.
 It's meant to anticipate the new mux coming with go1.22.
 Thanks to Eli Bendersky for a nice [post](https://eli.thegreenplace.net/2023/better-http-server-routing-in-go-122/) regarding this exciting develpment!
 
-Now we'll turn out attention to the runtime metrics themselves:
+### Runtime Stats
+
+Total memory allocated, cpu time, goroutine count, and so on can provide assurance that a Golang executable is behaving well.
+Traditionally these have been available via `runtime.ReadMemStats`, but go1.16 reduced overhead significantly with [runtime/metrics](https://pkg.go.dev/runtime/metrics).
+
+Trying it out:
 
 ```go
 // runtime.go
@@ -291,8 +275,8 @@ var (
 }
 ```
 
-We're specifying which stats to collect as a variable in our runtime package.
-Simple stuff, but it's fun to think about a use case where we had a need to handle dynamically ala [ConfigState](https://clarktrimble.online/blog/configstate/).
+We're specifying which stats to collect as a variable in the `runtime` package.
+Totally unconfigurable, sigh, but quite workable for many cases.
 
 Go forth and collect!:
 
@@ -323,7 +307,7 @@ func (rt Runtime) Collect(ts time.Time) (pa entity.PointsAt, err error) {
 }
 ```
 
-Build a sample slice per `runtime/metrics` in the stdlib, read, and convert them to our intermediate "entity".
+Setup a sample slice per stdlib `metrics`, read, and convert to our intermediate representation. 
 
 To round things out, the points helper:
 
@@ -361,15 +345,14 @@ But hopefully easy enough to read. :)
 
 Of some small interest, is the `Value` interface in `Point`.
 It embeds `fmt.Stringer` and supports ints and floats for now.
-Stringifying the values here would have worked as well, but hanging on to the numbers a little longer "feels" right.
+Storing the values as strings here would have worked as well, but hanging on to the numbers a bit longer "feels" right.
 
 Another thing emerging from the above sprawl, is the structuring of related points in two layers.
 `PointsAt` holds common infomations and `Points` the gritty details.
-Seems to be working out well!
 
-Having belabored the runtime collector so thouroughly, I think we'll skip over the prometheus formatter and it's many `Sprintf`s and string builders.
+Having belabored the runtime collector so thouroughly, I think we'll skip over the Prometheus formatter (think `fmt.Sprintf` and `strings.Builder`).
 
-And at long last a snippet from main putting all this to work:
+And at long last, a snippet from main putting a few collectors to work:
 
 ```go
 // main.go
@@ -380,21 +363,26 @@ And at long last a snippet from main putting all this to work:
 
 Exposing the runtime metrics is a one-liner and I've snuck in a couple additional collectors to spice things up.
 
-Disk usage is interesting not only in the sense that running out is still a fan-fav failure mode, but it also provides a nice example of points which differ only by labels.
+Disk usage is interesting not only in the sense that running out of space is a longtime fan-favorite failure mode, but it also provides an example of points which differ only by labels.
 
-Wave is kind of a toy collector that emits series of sine waves, giving us something fun(?) to look at.
-I did have a good time writing it :), a-and a simple sine wave actually could be useful for integration testing.
+Wave is a toy collector that emits series of sine waves, giving us something fun to visualize.
+I did have a good time writing it, and a predictable signal could be useful for integration testing.
 
-#### not collected at all
+### Metric or Log ?
 
-Before we wrap up collection, a quick word about what's not being collected.
+A quick word about what's not being collected.
+Requests over time per endpoint and the time taken to handle them for example.
+They're both potentially of some interest, yeah?
 
-For an api service, requests per endpoint and time spent handling those requests are _rather_ important metrics.
-I've not mentioned them til now, because that information is in the logs and in my somewhat humble opinion stats which can be aggregated from the logs are best collected in such a manner.  Not trying to be orthodox or anything; I'm espousing the idea as it seems so much easier to fire and forget a log message rather than tracking all that within an otherwise focused service.
+I'd say so and the good news is they can be aggregated from simple-to-emit request/response logs.
+In this way, relatively perishible logging serves multiple purposes before disposal and contributes to a sleek implementation.
 
-#### the metrics
+Often times there's murk in the metric vs log question with no single correct answer.
+With no need to get it "right", we can adjust for other factors in the infrastructure or whatever feels like a good balance.
 
-Before getting Prometheus and the other supporting services running, lets start `stator` and check the metrics endpoint with curl:
+### Endpoint Trial Run
+
+Running `stator` and hitting the metrics endpoint with curl:
 
 ```bash
 $ make                # test and build stator repo
@@ -432,16 +420,18 @@ wave_sine{name="three_random"} -0.17 1704906955008
 wave_sine{name="square"} 0.39 1704906955008
 ```
 
-Looking plausible :)
+Looks plausible : )
 
-Now we turn our attention to Consul, Prometheus, and Grafana so we can give it a proper workout!
+Now we turn our attention to Consul, Prometheus, Grafana and give `stator` a proper workout!
 
 ## Compose
 
-With four services, including `stator`, in the mix, we'll bring in docker-compose to help manage the environment.
-Here's the compose file:
+With four services in the mix, we'll bring in docker-compose to help manage the development environment.
+
+The compose file:
 
 ```yaml
+// docker-compose.yaml
 services:
   consul:
     image: hashicorp/consul:1.17.1
@@ -464,25 +454,9 @@ services:
     networks:
     - labneh
   stator:
-    build:
-      context: .
-      dockerfile: etc/stator.Dockerfile
-    env_file:
-      etc/stator.env
-    ports:
-    - 8087:8087
-    networks:
-    - labneh
+    ## show below
   godev:
-    build:
-      context: .
-      dockerfile: etc/godev.Dockerfile
-    networks:
-    - labneh
-    volumes:
-    - .:/project
-    - ~/go/pkg/mod:/go/pkg/mod
-    working_dir: /project
+    ## show below
 
 networks:
   labneh:
@@ -496,17 +470,9 @@ For example, from the `godev` container:
 {"consul":[]}
 ```
 
-We were able to use "consul" as the hostname given to curl, nice!
-
-A few noteables from the compose file:
- - `stator`'s config is specified via `env_file`
- - the current dir from host (repo) is mounted as "/project" in `godev`
- - the go pkg dir from host is mounted in `godev`, effectively caching
-
+We can use "consul" as the hostname given to curl, sweet!
 
 ## Discovery
-
-Our observable service needs a discovery service with which to register :)
 
 Starting up a stand-alone Consul with compose:
 
@@ -517,12 +483,26 @@ $ docker logs -f stator_consul_1 # as needed
 
 That was easy, thanks Hashi!
 
-## Stator
+## Go Develpment
 
-This one's a little more involved.
-We're going to deploy on Alpine for a small image, so we'll build Golang in Alpine as well (libc musl you know).
+We'll deploy on Alpine for a small container image, so we'll compile in an Alpine container (libc musl).
 
-Here's the `godev` dockerfile:
+From the compose file:
+
+```yaml
+  godev:
+    build:
+      context: .
+      dockerfile: etc/godev.Dockerfile
+    networks:
+    - labneh
+    volumes:
+    - .:/project
+    - ~/go/pkg/mod:/go/pkg/mod
+    working_dir: /project
+```
+
+The dockerfile:
 
 ```dockerfile
 FROM golang:1.21.6-alpine3.19
@@ -544,39 +524,69 @@ WORKDIR /project
 CMD sh
 ```
 
-Bog standard, but for the user hand-wring, explanation just below ..
+We mount the project and the go package module folders in the container.
+The idea here is to run `git` from the host system, sparing us the headache of dealing with auth from within the container.
+The `devo` user is created with our host user id so that file ownership is consistent.
 
-Now to build the container image:
+
+Building the `godev` container image:
 
 ```bash
 $ docker-compose build --build-arg userid=$(id -u) godev
 ```
 
-Aha! We're passing in our user id from the host system as a "build arg".
-This is to get file ownership lined up between host and container in mounted volumes.
+This'n could be built elsewhere and pulled in from a container registery.
 
-`godev` only needs to be built once, or when changes are made to its dockerfile.
+## Stator
+
+From the compose file:
+
+```yaml
+  stator:
+    build:
+      context: .
+      dockerfile: etc/stator.Dockerfile
+    env_file:
+      etc/stator.env
+    ports:
+    - 8087:8087
+    networks:
+    - labneh
+```
+
+The dockerfile copies the compiled binary into an Alpine.
+
+Note that we're sneaking in the config via `env_file`. Here's a peek:
+
+```bash
+STTR_SERVER_PORT=8087
+STTR_LOGGER_MAXLEN=999
+STTR_CLIENT_BASEURI=http://consul:8500
+STTR_ROSTER_SERVICE_ID=123654
+STTR_ROSTER_SERVICE_NAME=stator
+STTR_ROSTER_SERVICE_TAGS=dev,metrics
+```
 
 Cool, let's build `stator` and its container image, a-and start it up:
 
 ```bash
-$ docker-compose run godev make
-$ docker-compose build --no-cache stator
-$ docker-compose up -d stator
-$ docker logs -f stator_stator_1 # as needed
+$ docker-compose run godev make          # run tests and compile binary in Alpine
+$ docker-compose build --no-cache stator # build image for deployment
+$ docker-compose up -d stator            # start the service!
+$ docker logs -f stator_stator_1         # checkout the logs as needed
 ```
 
-Just like that, our service and Consul are nestled into their own little docker network!
-
-Browsing over to `http://your-docker-host-here:8500`, behold:
+Browsing over to `http://your-docker-host-here:8500` :
 
 {% image "./consul-stator.png", "Consul web ui showing registration of stator service" %}
 
-`stator` has registerd and Consul is keeping an eye on it for us.
+`stator` has registered and Consul is keeping an eye on it for us through the `/monitor` endpoint.
+
+Just like that, our service and Consul are nestled into their own docker network!
 
 ## Collection
 
-We'll need a little config to tell Prometheus to look for stuff in Consul:
+We'll need to configure Prometheus to look for services in Consul:
 
 ```yaml
 # prometheus.yaml
@@ -586,14 +596,16 @@ scrape_configs:
   - job_name: "prometheus"
     static_configs:
       - targets: ["localhost:9090"]
-  - job_name: "stator"
+  - job_name: "api_services"
     consul_sd_configs:
       - server: 'consul:8500'
-        services:
-          - "stator"
+        tags:
+          - "metrics"
 ```
 
-And turn the compose crank:
+The "api_services" job says to scrape Consul services with the "metrics" tag.
+
+And turn the compose crank again:
 
 ```bash
 $ docker-compose build prom
@@ -607,8 +619,10 @@ Browsing over to `http://your-docker-host-here:9090`, with any luck:
 
 Sweet scalable action!
 Prometheus is polling `stator` having discovered it via Consul.
-Neither know nothin' about our particular instance (in terms of static config I should say).
+Neither know nothin' about our service (in terms of static config I should say).
 Assuming a production Consul cluster and a couple of beefy Prometheans, many stators can be observed.
+
+Both Consul and Prometheus are, not surprisingly, ready and willing to send alerts when configured with the appropriate conditions.
 
 ## Vizualization
 
@@ -620,35 +634,40 @@ $ docker-compose up -d graf
 $ docker logs -f stator_graf_1 # as needed
 ```
 
-Browse on over to `http://your-docker-host-here:3000`, login with admin/admin, add Prometheus as a data source, Explore, choose "gort_mem_total_bytes" and:
+Browse on over to `http://your-docker-host-here:3000`,
+
+login (admin/admin) > add Prometheus data source > Explore > choose a metric > click Run Query and:
 
 {% image "./grafana-stator.png", "Grafana web ui showing stator service memory stats" %}
 
-Looks like `stator` is settling into a modest pile of RAM after start-up.
+Looks like `stator` is settling into a modest pile of RAM after start-up, thank goodness!
 
 And for a little fun let's see how the sine wave collector turned out:
 
 {% image "./grafana-wave.png", "Grafana web ui showing stator service wave stats" %}
 
-The yellow is three random sine waves and green is the first four of the Fourier series converging on a square wave.
-Isn't it amazing that just four of them get this close to a square?
-I think I've been in love with applied math since seeing a demo of this way back in middle school. :)
+Yellow is the sum of three random sine waves.
+
+Green is the first four of the Fourier series converging on a square wave.
+Isn't it amazing that just four sine waves get this close to a square?
+I think I've been in love with applied math since seeing a demo of this in third-grade, awww.
 
 ## The End
 
 Wow, mega-post!
+
 To sum up, `stator` achieves observability by:
  - registering with discovery
- - punctisomthingy logging
  - responding to a monitor endpoint
- - responding to a metrics endpoint with info on how well it's behaving
+ - responding to a metrics endpoint
+ - punctilious logging
 
-As such we could run thousands of them across a global infrastructure and keep tabs on all of 'em.
+Such observability contributes to efficienctly operating at scale.
 
 Per usual, I hope it's been informative and/or thought provoking.
-Get in touch with me via email if you'd like :)
+Feel free to get in touch with me via email if you'd like : )
 
-Thanks for reading!
+Thank you for reading!
 
 
 
