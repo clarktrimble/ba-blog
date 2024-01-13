@@ -26,7 +26,7 @@ Not me, lol.
 
 ## An Observable Service
 
-Just to mix things up, we'll start by going over the [code](https://github.com/clarktrimble/stator) before bringing everything up for a demo.
+Just to mix things up, we'll start by going over the [code](https://github.com/clarktrimble/stator/tree/107313e8799d74404ba63f78a18b854d7197aeff) before bringing everything up for a demo.
 
 __But first, what and why observable?__
 
